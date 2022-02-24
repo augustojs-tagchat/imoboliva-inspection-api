@@ -12,5 +12,6 @@ import { Appraiser, AppraiserSchema } from './schemas/appraiser.schema';
   ],
   controllers: [AppraiserController],
   providers: [AppraiserService],
+  exports: [AppraiserService],
 })
 export class AppraiserModule {}

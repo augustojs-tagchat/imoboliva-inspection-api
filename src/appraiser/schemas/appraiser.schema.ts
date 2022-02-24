@@ -5,7 +5,7 @@ export type AppraiserDocument = Appraiser & Document;
 
 @Schema({ collection: 'appraiser', timestamps: true })
 export class Appraiser {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true })

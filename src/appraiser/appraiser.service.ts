@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Appraiser, AppraiserDocument } from './schemas/appraiser.schema';
-import { CreateAppraiserDto } from './dto/create-appraiser.dto';
-import { UpdateAppraiserDto } from './dto/update-appraiser.dto';
+import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
 @Injectable()
 export class AppraiserService {
@@ -11,24 +10,12 @@ export class AppraiserService {
     private appraiserModel: Model<AppraiserDocument>,
   ) {}
 
-  async create(createAppraiserDto: CreateAppraiserDto) {
-    const appraiser = new this.appraiserModel(createAppraiserDto);
+  async create(registerDto: RegisterDto) {
+    const appraiser = new this.appraiserModel(registerDto);
     return appraiser.save();
   }
 
-  findAll() {
-    return `This action returns all appraiser`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} appraiser`;
-  }
-
-  update(id: number, updateAppraiserDto: UpdateAppraiserDto) {
-    return `This action updates a #${id} appraiser`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} appraiser`;
+  async findByEmail(email: string) {
+    return await this.appraiserModel.findOne({ email: email });
   }
 }

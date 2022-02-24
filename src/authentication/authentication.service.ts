@@ -1,26 +1,57 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthenticationDto } from './dto/create-authentication.dto';
-import { UpdateAuthenticationDto } from './dto/update-authentication.dto';
-
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
+import * as bcrypt from 'bcrypt';
+import { AppraiserService } from 'src/appraiser/appraiser.service';
+import { LoginDTO } from './dto/login.dto';
 @Injectable()
 export class AuthenticationService {
-  create(createAuthenticationDto: CreateAuthenticationDto) {
-    return 'This action adds a new authentication';
+  constructor(private readonly appraiser: AppraiserService) {}
+
+  public async register(registerDto: RegisterDto) {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+    const appraiser = await this.appraiser.findByEmail(registerDto.email);
+
+    if (appraiser) {
+      throw new HttpException(
+        'User with this email already exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.appraiser.create({
+      ...registerDto,
+      password: hashedPassword,
+    });
   }
 
-  findAll() {
-    return `This action returns all authentication`;
+  public async login(loginDto: LoginDTO) {
+    const appraiser = await this.appraiser.findByEmail(loginDto.email);
+
+    if (!appraiser) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.verifyPassword(loginDto.password, appraiser.password);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} authentication`;
-  }
+  private async verifyPassword(
+    appraiserPassword: string,
+    hashedPassword: string,
+  ) {
+    const isPasswordMatching = await bcrypt.compare(
+      appraiserPassword,
+      hashedPassword,
+    );
 
-  update(id: number, updateAuthenticationDto: UpdateAuthenticationDto) {
-    return `This action updates a #${id} authentication`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} authentication`;
+    if (!isPasswordMatching) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
