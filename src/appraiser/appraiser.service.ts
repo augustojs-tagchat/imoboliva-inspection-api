@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Appraiser, AppraiserDocument } from './schemas/appraiser.schema';
 import { CreateAppraiserDto } from './dto/create-appraiser.dto';
 import { UpdateAppraiserDto } from './dto/update-appraiser.dto';
-
+import { Model } from 'mongoose';
 @Injectable()
 export class AppraiserService {
-  create(createAppraiserDto: CreateAppraiserDto) {
-    return 'This action adds a new appraiser';
+  constructor(
+    @InjectModel(Appraiser.name)
+    private appraiserModel: Model<AppraiserDocument>,
+  ) {}
+
+  async create(createAppraiserDto: CreateAppraiserDto) {
+    const appraiser = new this.appraiserModel(createAppraiserDto);
+    return appraiser.save();
   }
 
   findAll() {

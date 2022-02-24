@@ -16,8 +16,8 @@ export class AppraiserController {
   constructor(private readonly appraiserService: AppraiserService) {}
 
   @Post()
-  create(@Body() createAppraiserDto: CreateAppraiserDto) {
-    return this.appraiserService.create(createAppraiserDto);
+  async create(@Body() createAppraiserDto: CreateAppraiserDto) {
+    return await this.appraiserService.create(createAppraiserDto);
   }
 
   @Get()
