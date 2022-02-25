@@ -34,7 +34,7 @@ export class AuthenticationController {
     response.setHeader('Set-Cookie', cookie);
 
     user.password = undefined;
-    return response.send({ user, accessToken: cookie });
+    return response.send(user);
   }
 
   @UseGuards(JwtAuthenticationGuard)
