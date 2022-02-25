@@ -3,6 +3,7 @@ import { AppraiserModule } from './appraiser/appraiser.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { InspectionModule } from './inspection/inspection.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -17,6 +18,7 @@ import * as Joi from 'joi';
     MongooseModule.forRoot(process.env.MONGO_URI),
     AppraiserModule,
     AuthenticationModule,
+    InspectionModule,
   ],
   controllers: [],
   providers: [],
