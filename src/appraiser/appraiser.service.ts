@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Appraiser, AppraiserDocument } from './schemas/appraiser.schema';
 import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
+import { ObjectId, isValidObjectId } from 'mongoose';
+
 @Injectable()
 export class AppraiserService {
   constructor(
@@ -19,7 +21,16 @@ export class AppraiserService {
     return await this.appraiserModel.findOne({ email: email });
   }
 
-  public async findById(userId: string) {
-    return await this.appraiserModel.findOne({ _id: userId });
+  public async findById(userId: ObjectId) {
+    const appraiser = await this.appraiserModel.findOne({ _id: userId });
+
+    if (appraiser) {
+      return appraiser;
+    }
+
+    throw new HttpException(
+      'Appraiser with this id does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 }
