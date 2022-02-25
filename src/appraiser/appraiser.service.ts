@@ -10,12 +10,16 @@ export class AppraiserService {
     private appraiserModel: Model<AppraiserDocument>,
   ) {}
 
-  async create(registerDto: RegisterDto) {
+  public async create(registerDto: RegisterDto) {
     const appraiser = new this.appraiserModel(registerDto);
     return appraiser.save();
   }
 
-  async findByEmail(email: string) {
+  public async findByEmail(email: string) {
     return await this.appraiserModel.findOne({ email: email });
+  }
+
+  public async findById(userId: string) {
+    return await this.appraiserModel.findOne({ _id: userId });
   }
 }

@@ -3,9 +3,26 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { AppraiserService } from 'src/appraiser/appraiser.service';
 import { LoginDTO } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TokenPayload } from './interface/tokenPayload.interface';
+import { ObjectId } from 'mongoose';
+
 @Injectable()
 export class AuthenticationService {
-  constructor(private readonly appraiser: AppraiserService) {}
+  constructor(
+    private readonly appraiser: AppraiserService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  public getCookieWithJwtToken(userId: ObjectId) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload);
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'JWT_EXPIRATION_TIME',
+    )}`;
+  }
 
   public async register(registerDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
@@ -36,6 +53,8 @@ export class AuthenticationService {
     }
 
     await this.verifyPassword(loginDto.password, appraiser.password);
+
+    return appraiser;
   }
 
   private async verifyPassword(

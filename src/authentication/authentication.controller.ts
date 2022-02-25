@@ -1,7 +1,10 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDTO } from './dto/login.dto';
+import { LocalAuthenticationGuard } from './guard/localAuthentication.guard';
+import RequestWithUser from './interface/requestWithUser.interface';
+import { Response } from 'express';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -12,8 +15,16 @@ export class AuthenticationController {
     return this.authenticationService.register(registerDto);
   }
 
+  @UseGuards(LocalAuthenticationGuard)
   @Post('login')
-  findAll(@Body() loginDto: LoginDTO) {
-    return this.authenticationService.login(loginDto);
+  login(@Req() request: RequestWithUser, @Res() response: Response) {
+    const { user } = request;
+
+    const cookie = this.authenticationService.getCookieWithJwtToken(user._id);
+
+    response.setHeader('Set-Cookie', cookie);
+
+    user.password = undefined;
+    return response.send(user);
   }
 }
