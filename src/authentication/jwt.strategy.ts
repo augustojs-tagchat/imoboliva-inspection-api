@@ -3,14 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { AppraiserService } from 'src/appraiser/appraiser.service';
+import { UserService } from 'src/users/user.service';
 import { TokenPayload } from './interface/tokenPayload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly appraiserService: AppraiserService,
+    private readonly userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -23,6 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayload) {
-    return this.appraiserService.findById(payload.userId);
+    return this.userService.findById(payload.userId);
   }
 }

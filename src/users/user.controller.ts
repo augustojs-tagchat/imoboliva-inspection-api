@@ -1,17 +1,14 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
-import { AppraiserService } from './appraiser.service';
+import { UserService } from './user.service';
 
-@Controller('appraiser')
-export class AppraiserController {
-  constructor(private readonly appraiserService: AppraiserService) {}
+@Controller('user')
+export class UserController {
+  constructor(private readonly appraiserService: UserService) {}
 
   @Get('inspections')
   @UseGuards(JwtAuthenticationGuard)
   inspections() {
     return { status: 200, data: 'Your inspections' };
   }
-
-  // @Get(':id')
-  // public async findOne(@Param('id') userId: string) {}
 }

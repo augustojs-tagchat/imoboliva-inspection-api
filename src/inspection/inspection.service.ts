@@ -5,20 +5,20 @@ import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { UpdateInspectionDto } from './dto/update-inspection.dto';
 import { Model } from 'mongoose';
 import { IRealState } from './interface/real-state.interface';
-import { AppraiserService } from 'src/appraiser/appraiser.service';
+import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class InspectionService {
   constructor(
     @InjectModel(Inspection.name)
     private readonly inspectionModel: Model<InspectionDocument>,
-    private readonly appraiserService: AppraiserService,
+    private readonly userService: UserService,
   ) {}
 
   create(createInspectionDto: CreateInspectionDto) {
     const { address, name, email } = createInspectionDto;
 
-    const appraiser = this.appraiserService.findByEmail(email);
+    const appraiser = this.userService.findByEmail(email);
   }
 
   findAll() {

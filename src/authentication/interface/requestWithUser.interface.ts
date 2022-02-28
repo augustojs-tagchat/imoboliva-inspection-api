@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import { Appraiser } from '../../appraiser/schemas/appraiser.schema';
+import { User } from '../../users/schemas/user.schema';
 
 interface RequestWithUser extends Request {
-  user: Appraiser;
+  user: User;
 }
 
 export default RequestWithUser;

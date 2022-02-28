@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
 
-export type AppraiserDocument = Appraiser & Document;
+export type UserDocument = User & Document;
 
-@Schema({ collection: 'appraiser', timestamps: true })
-export class Appraiser {
+@Schema({ collection: 'users', timestamps: true })
+export class User {
   _id: ObjectId;
 
   @Prop({ required: true, unique: true })
@@ -12,6 +12,9 @@ export class Appraiser {
 
   @Prop({ required: true })
   name: string;
+
+  @Prop({ enum: ['admin', 'appraiser'] })
+  role: string;
 
   @Prop()
   avatar: string;
@@ -23,4 +26,4 @@ export class Appraiser {
   phone: string;
 }
 
-export const AppraiserSchema = SchemaFactory.createForClass(Appraiser);
+export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
-import { AppraiserModule } from 'src/appraiser/appraiser.module';
+import { UserModule } from 'src/users/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,7 +12,7 @@ import { JwtStrategy } from './jwt.strategy';
   controllers: [AuthenticationController],
   providers: [AuthenticationService, LocalStrategy, JwtStrategy],
   imports: [
-    AppraiserModule,
+    UserModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({

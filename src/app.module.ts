@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppraiserModule } from './appraiser/appraiser.module';
+import { UserModule } from './users/user.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
@@ -18,7 +18,7 @@ import * as Joi from 'joi';
       }),
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
-    AppraiserModule,
+    UserModule,
     AuthenticationModule,
     InspectionModule,
     AreasModule,
