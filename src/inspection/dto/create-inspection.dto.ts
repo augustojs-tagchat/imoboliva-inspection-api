@@ -4,6 +4,10 @@ import { IAddress } from '../interface/address.interface';
 export class CreateInspectionDto {
   @IsNotEmpty()
   @IsString()
+  real_state_id: string;
+
+  @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsNotEmpty()

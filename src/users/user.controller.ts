@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly appraiserService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get('inspections')
   @UseGuards(JwtAuthenticationGuard)

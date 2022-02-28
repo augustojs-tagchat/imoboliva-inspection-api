@@ -18,7 +18,16 @@ export class UserService {
   }
 
   public async findByEmail(email: string) {
-    return await this.userModel.findOne({ email: email });
+    const user = await this.userModel.findOne({ email: email });
+
+    if (user) {
+      return user;
+    }
+
+    throw new HttpException(
+      'User with this email does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   public async findById(userId: ObjectId) {

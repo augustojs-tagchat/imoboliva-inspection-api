@@ -14,6 +14,9 @@ export class Inspection {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ type: mongoose.Types.ObjectId, required: true })
+  user_id: ObjectId;
+
   @Prop({ type: IAddress })
   address: IAddress;
 
