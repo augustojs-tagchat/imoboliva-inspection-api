@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
 import { IAddress } from '../interface/address.interface';
 
 export class CreateInspectionDto {
@@ -8,4 +8,8 @@ export class CreateInspectionDto {
 
   @IsNotEmpty()
   address: IAddress;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }

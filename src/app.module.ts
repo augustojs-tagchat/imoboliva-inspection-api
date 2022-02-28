@@ -4,6 +4,8 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { InspectionModule } from './inspection/inspection.module';
+import { AreasModule } from './areas/areas.module';
+import { InspectionPointsModule } from './inspection-points/inspection-points.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -19,6 +21,8 @@ import * as Joi from 'joi';
     AppraiserModule,
     AuthenticationModule,
     InspectionModule,
+    AreasModule,
+    InspectionPointsModule,
   ],
   controllers: [],
   providers: [],

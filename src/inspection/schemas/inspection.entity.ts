@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
+import { AreaDocument } from '../../areas/schemas/area.entity';
 
 export type InspectionDocument = Inspection & Document;
 
@@ -15,8 +17,11 @@ export class Inspection {
   @Prop({ type: IAddress })
   address: IAddress;
 
+  @Prop({ type: mongoose.Types.DocumentArray, ref: 'areas' })
+  areas: AreaDocument[];
+
   @Prop({ required: false, type: IRealState })
-  real_state: IRealState;
+  real_state: ObjectId;
 
   @Prop({ required: true, enum: ['pending', 'started', 'done'] })
   active: 'pending' | 'started' | 'done';
