@@ -14,11 +14,14 @@ import { LocalAuthenticationGuard } from './guard/localAuthentication.guard';
 import RequestWithUser from './interface/requestWithUser.interface';
 import { Response } from 'express';
 import JwtAuthenticationGuard from './guard/jwt-authentication.guard';
+import RoleGuard from './guard/role.guard';
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
+  @UseGuards(RoleGuard('admin'))
+  @UseGuards(JwtAuthenticationGuard)
   @Post('register')
   create(@Body() registerDto: RegisterDto) {
     return this.authenticationService.register(registerDto);

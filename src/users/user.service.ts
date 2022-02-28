@@ -4,6 +4,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
 import { ObjectId, isValidObjectId } from 'mongoose';
+import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,19 @@ export class UserService {
 
     throw new HttpException(
       'User with this email does not exist',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  public async getUniqueEmailUser(email: string) {
+    const user = await this.userModel.findOne({ email: email });
+
+    if (!user) {
+      return user;
+    }
+
+    throw new HttpException(
+      'User with this email already exists',
       HttpStatus.NOT_FOUND,
     );
   }

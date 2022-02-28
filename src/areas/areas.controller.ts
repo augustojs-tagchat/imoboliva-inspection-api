@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
 
@@ -9,5 +9,10 @@ export class AreasController {
   @Post()
   create(@Body() createAreaDto: CreateAreaDto) {
     return this.areasService.create(createAreaDto);
+  }
+
+  @Get()
+  async findAll() {
+    return await this.areasService.getAll();
   }
 }

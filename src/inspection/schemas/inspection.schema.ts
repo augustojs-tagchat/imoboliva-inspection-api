@@ -4,6 +4,7 @@ import { Document, ObjectId } from 'mongoose';
 import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
 import { AreaDocument } from '../../areas/schemas/area.entity';
+import { Area } from '../../areas/schemas/area.entity';
 
 export type InspectionDocument = Inspection & Document;
 
@@ -23,8 +24,14 @@ export class Inspection {
   @Prop({ type: mongoose.Types.DocumentArray, ref: 'areas' })
   areas: AreaDocument[];
 
+  @Prop({ required: true })
+  date: Date;
+
   @Prop({ required: false, type: IRealState })
   real_state_id: ObjectId;
+
+  @Prop()
+  real_state_areas: Area[] | null;
 
   @Prop({ required: true, enum: ['pending', 'started', 'done'] })
   active: 'pending' | 'started' | 'done';

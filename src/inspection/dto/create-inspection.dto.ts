@@ -16,4 +16,7 @@ export class CreateInspectionDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @IsNotEmpty()
+  date: Date;
 }

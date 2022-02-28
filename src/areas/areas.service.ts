@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { Model } from 'mongoose';
 import { ObjectId, isValidObjectId } from 'mongoose';
@@ -12,9 +12,23 @@ export class AreasService {
     private areaModel: Model<AreaDocument>,
   ) {}
 
-  create(createAreaDto: CreateAreaDto) {
+  async create(createAreaDto: CreateAreaDto) {
+    const newArea = await this.areaModel.findOne({ name: createAreaDto.name });
+
+    if (newArea) {
+      throw new HttpException(
+        'Name for new area already in use',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     createAreaDto.active = false;
     const area = new this.areaModel(createAreaDto);
     return area.save();
+  }
+
+  async getAll() {
+    const areas = await this.areaModel.find();
+    return areas;
   }
 }

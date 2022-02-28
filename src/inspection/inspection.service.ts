@@ -10,6 +10,7 @@ import {
   EntryInspectionDocument,
   EntryInspection,
 } from './schemas/entry-inspection.schema';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class InspectionService {
@@ -23,9 +24,18 @@ export class InspectionService {
   ) {}
 
   async create(createInspectionDto: CreateInspectionDto) {
-    const { address, name, email, real_state_id } = createInspectionDto;
+    const { address, name, email, real_state_id, date } = createInspectionDto;
 
     const user = await this.userService.findByEmail(email);
+
+    const newInspection = await this.inspectionModel.findOne({ name: name });
+
+    if (newInspection) {
+      throw new HttpException(
+        'Name for inspection already in use',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     const isValid = isValidObjectId(real_state_id);
 
@@ -37,6 +47,8 @@ export class InspectionService {
       address,
       active: 'pending',
       name,
+      date,
+      real_state_areas: null,
       real_state_id,
       user_id: user._id,
     });
@@ -81,5 +93,9 @@ export class InspectionService {
 
   findAll() {
     return this.inspectionModel.find();
+  }
+
+  async updateInspectionAreas(inspectionId: string, userId: ObjectId) {
+    //
   }
 }

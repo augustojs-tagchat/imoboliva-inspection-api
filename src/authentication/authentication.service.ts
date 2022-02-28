@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/users/user.service';
@@ -27,14 +32,9 @@ export class AuthenticationService {
   public async register(registerDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-    const appraiser = await this.userService.findByEmail(registerDto.email);
-
-    if (appraiser) {
-      throw new HttpException(
-        'User with this email already exist',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const appraiser = await this.userService.getUniqueEmailUser(
+      registerDto.email,
+    );
 
     return await this.userService.create({
       ...registerDto,
