@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
+import { CreateEntryInspectionDTO } from './dto/create-entry-inspection.dto';
 
 @Controller('inspection')
 export class InspectionController {
@@ -9,6 +10,15 @@ export class InspectionController {
   @Post()
   create(@Body() createInspectionDto: CreateInspectionDto) {
     return this.inspectionService.create(createInspectionDto);
+  }
+
+  @Post('entry')
+  createEntryInspection(
+    @Body() createEntryInspectionDto: CreateEntryInspectionDTO,
+  ) {
+    return this.inspectionService.createEntryInspection(
+      createEntryInspectionDto,
+    );
   }
 
   @Get(':user_id')

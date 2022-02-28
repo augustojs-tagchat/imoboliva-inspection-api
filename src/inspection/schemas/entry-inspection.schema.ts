@@ -5,10 +5,10 @@ import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
 import { AreaDocument } from '../../areas/schemas/area.entity';
 
-export type InspectionDocument = Inspection & Document;
+export type EntryInspectionDocument = EntryInspection & Document;
 
-@Schema({ collection: 'inspection', timestamps: true })
-export class Inspection {
+@Schema({ collection: 'entry_inspection', timestamps: true })
+export class EntryInspection {
   _id: ObjectId;
 
   @Prop({ required: true })
@@ -24,7 +24,7 @@ export class Inspection {
   areas: AreaDocument[];
 
   @Prop({ required: false, type: IRealState })
-  real_state: ObjectId;
+  real_state_id: ObjectId;
 
   @Prop({ required: true, enum: ['pending', 'started', 'done'] })
   active: 'pending' | 'started' | 'done';
@@ -33,4 +33,5 @@ export class Inspection {
   image_url: string;
 }
 
-export const InspectionSchema = SchemaFactory.createForClass(Inspection);
+export const EntryInspectionSchema =
+  SchemaFactory.createForClass(EntryInspection);

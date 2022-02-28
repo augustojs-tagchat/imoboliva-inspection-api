@@ -1,18 +1,24 @@
-import { Get, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Inspection, InspectionDocument } from './schemas/inspection.entity';
+import { Inspection, InspectionDocument } from './schemas/inspection.schema';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
-import { UpdateInspectionDto } from './dto/update-inspection.dto';
 import { Model, isValidObjectId } from 'mongoose';
-import { IRealState } from './interface/real-state.interface';
 import { UserService } from 'src/users/user.service';
 import mongoose from 'mongoose';
+import { CreateEntryInspectionDTO } from './dto/create-entry-inspection.dto';
+import {
+  EntryInspectionDocument,
+  EntryInspection,
+} from './schemas/entry-inspection.schema';
 
 @Injectable()
 export class InspectionService {
   constructor(
     @InjectModel(Inspection.name)
     private readonly inspectionModel: Model<InspectionDocument>,
+
+    @InjectModel(EntryInspection.name)
+    private readonly entryInspectionModel: Model<EntryInspectionDocument>,
     private readonly userService: UserService,
   ) {}
 
@@ -31,9 +37,33 @@ export class InspectionService {
       address,
       active: 'pending',
       name,
-      email,
       real_state_id,
       user_id: user._id,
+    });
+
+    return inspection.save();
+  }
+
+  async createEntryInspection(
+    createEntryInspectionDto: CreateEntryInspectionDTO,
+  ) {
+    const { address, name, real_state_id, areas, inspection_id, user_id } =
+      createEntryInspectionDto;
+
+    const isValid = isValidObjectId(real_state_id);
+
+    if (!isValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspection = new this.entryInspectionModel({
+      address,
+      areas,
+      inspection_id,
+      active: 'started',
+      name,
+      real_state_id,
+      user_id: user_id,
     });
 
     return inspection.save();
