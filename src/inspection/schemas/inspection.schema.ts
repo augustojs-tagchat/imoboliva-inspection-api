@@ -3,12 +3,15 @@ import mongoose from 'mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
-import { AreaDocument } from '../../areas/schemas/area.entity';
-import { Area } from '../../areas/schemas/area.entity';
+import { AreaDocument } from '../../areas/schemas/area.schema';
+import { Area } from '../../areas/schemas/area.schema';
 
 export type InspectionDocument = Inspection & Document;
 
-@Schema({ collection: 'inspection', timestamps: true })
+@Schema({
+  collection: 'inspection',
+  timestamps: { createdAt: 'created_at', updatedAt: 'update_at' },
+})
 export class Inspection {
   _id: ObjectId;
 

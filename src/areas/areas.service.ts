@@ -3,7 +3,7 @@ import { CreateAreaDto } from './dto/create-area.dto';
 import { Model } from 'mongoose';
 import { ObjectId, isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Area, AreaDocument } from './schemas/area.entity';
+import { Area, AreaDocument } from './schemas/area.schema';
 
 @Injectable()
 export class AreasService {

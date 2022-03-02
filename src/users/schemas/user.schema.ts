@@ -3,7 +3,10 @@ import { Document, ObjectId } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-@Schema({ collection: 'users', timestamps: true })
+@Schema({
+  collection: 'users',
+  timestamps: { createdAt: 'created_at', updatedAt: 'update_at' },
+})
 export class User {
   _id: ObjectId;
 

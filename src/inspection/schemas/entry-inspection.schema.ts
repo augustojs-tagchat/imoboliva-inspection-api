@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
-import { AreaDocument } from '../../areas/schemas/area.entity';
+import { AreaDocument } from '../../areas/schemas/area.schema';
 
 export type EntryInspectionDocument = EntryInspection & Document;
 

@@ -11,6 +11,7 @@ import {
   EntryInspection,
 } from './schemas/entry-inspection.schema';
 import { ObjectId } from 'mongoose';
+import { Area } from 'src/areas/schemas/area.schema';
 
 @Injectable()
 export class InspectionService {
@@ -20,6 +21,7 @@ export class InspectionService {
 
     @InjectModel(EntryInspection.name)
     private readonly entryInspectionModel: Model<EntryInspectionDocument>,
+
     private readonly userService: UserService,
   ) {}
 
@@ -95,7 +97,38 @@ export class InspectionService {
     return this.inspectionModel.find();
   }
 
-  async updateInspectionAreas(inspectionId: string, userId: ObjectId) {
-    //
+  async updateInspectionAreas(
+    inspectionId: string,
+    userId: ObjectId,
+    area: Area,
+  ) {
+    const inspection = await this.inspectionModel.findOne({
+      _id: inspectionId,
+    });
+
+    if (!inspection) {
+      throw new HttpException(
+        'Inspection with this id does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (!(String(inspection.user_id) === String(userId))) {
+      throw new HttpException(
+        'User does not have permission to edit this inspection',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const updatedAreas = inspection.real_state_areas;
+
+    updatedAreas.push(area);
+
+    await this.inspectionModel.updateOne(
+      {
+        id: inspection._id,
+      },
+      { real_state_areas: updatedAreas },
+    );
   }
 }

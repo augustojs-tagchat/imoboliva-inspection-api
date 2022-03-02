@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AreasService } from './areas.service';
 import { AreasController } from './areas.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AreaSchema, Area } from './schemas/area.entity';
+import { AreaSchema, Area } from './schemas/area.schema';
 
 @Module({
   imports: [

@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   InspectionPoint,
   InspectionPointDocument,
-} from '../inspection-points/schemas/inspection-point.entity';
+} from './schemas/inspection-point.schema';
 
 @Injectable()
 export class InspectionPointsService {
@@ -15,11 +15,16 @@ export class InspectionPointsService {
     private inspectionPointModel: Model<InspectionPointDocument>,
   ) {}
 
-  create(createInspectionPointDto: CreateInspectionPointDto) {
+  public async create(createInspectionPointDto: CreateInspectionPointDto) {
     const inspectionPoint = new this.inspectionPointModel(
       createInspectionPointDto,
     );
 
-    return inspectionPoint.save();
+    return await inspectionPoint.save();
+  }
+
+  public async findAll() {
+    const inspectionPoints = await this.inspectionPointModel.find();
+    return inspectionPoints;
   }
 }

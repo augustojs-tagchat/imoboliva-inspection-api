@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   InspectionPointSchema,
   InspectionPoint,
-} from './schemas/inspection-point.entity';
+} from './schemas/inspection-point.schema';
 
 @Module({
   imports: [
