@@ -8,6 +8,7 @@ import {
   EntryInspectionSchema,
   EntryInspection,
 } from './schemas/entry-inspection.schema';
+import { FilesModule } from 'src/files/files.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import {
       { schema: InspectionSchema, name: Inspection.name },
       { schema: EntryInspectionSchema, name: EntryInspection.name },
     ]),
+    FilesModule,
     UserModule,
   ],
   controllers: [InspectionController],

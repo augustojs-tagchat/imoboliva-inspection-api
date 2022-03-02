@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { InspectionModule } from './inspection/inspection.module';
 import { AreasModule } from './areas/areas.module';
 import { InspectionPointsModule } from './inspection-points/inspection-points.module';
+import { FilesModule } from './files/files.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -23,6 +24,7 @@ import * as Joi from 'joi';
     InspectionModule,
     AreasModule,
     InspectionPointsModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
