@@ -98,7 +98,7 @@ export class InspectionService {
           fileName: image.originalname,
           fileSize: image.size,
           mimetype: image.mimetype,
-          urlFileName: `image-${inspectionEntry._id}-${area._id}`,
+          urlFileName: `${inspectionEntry._id}-${area._id}-${image.originalname}`,
         });
       });
 
@@ -158,7 +158,7 @@ export class InspectionService {
 
     await this.inspectionModel.updateOne(
       {
-        id: inspection._id,
+        _id: inspection._id,
       },
       { real_state_areas: updatedAreas },
     );
