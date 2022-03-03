@@ -8,7 +8,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
@@ -16,9 +16,8 @@ import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import { Area } from 'src/areas/schemas/area.schema';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
-import { UpdateInspectionAreasDTO } from './dto/update-inspection-areas.dto';
 import { ObjectId } from 'mongoose';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('inspection')
 export class InspectionController {
@@ -32,11 +31,11 @@ export class InspectionController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Patch('entry/:inspection_id')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('image'))
   public async updateEntryInspection(
     @Body() updateEntryInspectionDto: UpdateEntryInspectionDTO,
     @Param() params: { inspection_id: ObjectId },
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFiles() image: Array<Express.Multer.File>,
   ) {
     const { _id, active, name, inspection_points, created_at, updated_at } =
       updateEntryInspectionDto;

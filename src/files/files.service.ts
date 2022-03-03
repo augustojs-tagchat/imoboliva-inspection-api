@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { File, FileDocument } from './schemas/file.schema';
-import mongoose from 'mongoose';
 import { FileUploadDTO } from './dto/file-upload.dto';
 
 @Injectable()

@@ -5,15 +5,13 @@ import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { UserService } from 'src/users/user.service';
 import mongoose from 'mongoose';
-import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import {
   EntryInspectionDocument,
   EntryInspection,
 } from './schemas/entry-inspection.schema';
 import { ObjectId } from 'mongoose';
-import { Area, AreaDocument } from 'src/areas/schemas/area.schema';
+import { Area } from 'src/areas/schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
-import { FileDocument } from 'src/files/schemas/file.schema';
 
 @Injectable()
 export class InspectionService {
@@ -77,7 +75,7 @@ export class InspectionService {
   public async updateEntryInspection(
     inspectionId: ObjectId,
     area: any,
-    image?: Express.Multer.File,
+    images?: Array<Express.Multer.File>,
   ) {
     const inspectionEntry = await this.entryInspectionModel.findOne({
       _id: inspectionId,
@@ -91,19 +89,22 @@ export class InspectionService {
     }
 
     const areasArray = [...inspectionEntry.areas];
+    area.images = [];
 
-    if (image) {
-      const areaImagesArray = [];
-      const areaImage = await this.filesService.imageUpload({
-        dataBuffer: image.buffer,
-        fileName: image.originalname,
-        fileSize: image.size,
-        mimetype: image.mimetype,
-        urlFileName: `image-${inspectionEntry._id}-${area._id}`,
+    if (images) {
+      const promisesImages = images.map(async (image) => {
+        return await this.filesService.imageUpload({
+          dataBuffer: image.buffer,
+          fileName: image.originalname,
+          fileSize: image.size,
+          mimetype: image.mimetype,
+          urlFileName: `image-${inspectionEntry._id}-${area._id}`,
+        });
       });
-      areaImagesArray.push(areaImage);
-      area.images = areaImagesArray;
+
+      area.images = await Promise.all(promisesImages);
     }
+
     areasArray.push(area);
 
     await this.entryInspectionModel.updateOne(
