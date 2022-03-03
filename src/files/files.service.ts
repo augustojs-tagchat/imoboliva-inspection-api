@@ -28,14 +28,12 @@ export class FilesService {
       ContentType: fileUploadDto.mimetype,
     };
 
-    return new Promise<File>((resolve, reject) => {
+    return new Promise<FileDocument>((resolve, reject) => {
       s3.putObject(body, async (err) => {
         if (err) {
           reject(err);
         } else {
-          const urlFile = `https://${process.env.PUBLIC_DO_SPACES_NAME}.${
-            process.env.PUBLIC_DO_SPACES_ENDPOINT
-          }/area-image-${new Date()}`;
+          const urlFile = `https://${process.env.PUBLIC_DO_SPACES_NAME}.${process.env.PUBLIC_DO_SPACES_ENDPOINT}/${fileUploadDto.urlFileName}`;
 
           const newFile = new this.fileModel({
             key: fileUploadDto.fileName,

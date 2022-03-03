@@ -7,14 +7,18 @@ import {
   Patch,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
-import { CreateEntryInspectionDTO } from './dto/create-entry-inspection.dto';
+import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import { Area } from 'src/areas/schemas/area.schema';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { UpdateInspectionAreasDTO } from './dto/update-inspection-areas.dto';
+import { ObjectId } from 'mongoose';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('inspection')
 export class InspectionController {
@@ -27,25 +31,46 @@ export class InspectionController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
-  @Post('entry')
-  createEntryInspection(
-    @Body() createEntryInspectionDto: CreateEntryInspectionDTO,
+  @Patch('entry/:inspection_id')
+  @UseInterceptors(FileInterceptor('image'))
+  public async updateEntryInspection(
+    @Body() updateEntryInspectionDto: UpdateEntryInspectionDTO,
+    @Param() params: { inspection_id: ObjectId },
+    @UploadedFile() image: Express.Multer.File,
   ) {
-    return this.inspectionService.createEntryInspection(
-      createEntryInspectionDto,
+    const { _id, active, name, inspection_points, created_at, updated_at } =
+      updateEntryInspectionDto;
+
+    const areaToJson = {
+      _id,
+      active,
+      name,
+      inspection_points,
+      created_at,
+      updated_at,
+    };
+
+    const inspectionPointsArray = JSON.parse(areaToJson.inspection_points);
+
+    areaToJson.inspection_points = inspectionPointsArray;
+
+    return await this.inspectionService.updateEntryInspection(
+      params.inspection_id,
+      areaToJson,
+      image,
     );
   }
 
   @UseGuards(JwtAuthenticationGuard)
   @Get(':user_id')
-  findOne(@Param() params: { user_id: string }) {
-    return this.inspectionService.findByUserId(params.user_id);
+  public async findOne(@Param() params: { user_id: string }) {
+    return await this.inspectionService.findByUserId(params.user_id);
   }
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
-  findAll() {
-    return this.inspectionService.findAll();
+  public async findAll() {
+    return await this.inspectionService.findAll();
   }
 
   @UseGuards(JwtAuthenticationGuard)

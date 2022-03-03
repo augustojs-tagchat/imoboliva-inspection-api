@@ -5,13 +5,15 @@ import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { UserService } from 'src/users/user.service';
 import mongoose from 'mongoose';
-import { CreateEntryInspectionDTO } from './dto/create-entry-inspection.dto';
+import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import {
   EntryInspectionDocument,
   EntryInspection,
 } from './schemas/entry-inspection.schema';
 import { ObjectId } from 'mongoose';
-import { Area } from 'src/areas/schemas/area.schema';
+import { Area, AreaDocument } from 'src/areas/schemas/area.schema';
+import { FilesService } from 'src/files/files.service';
+import { FileDocument } from 'src/files/schemas/file.schema';
 
 @Injectable()
 export class InspectionService {
@@ -23,6 +25,8 @@ export class InspectionService {
     private readonly entryInspectionModel: Model<EntryInspectionDocument>,
 
     private readonly userService: UserService,
+
+    private readonly filesService: FilesService,
   ) {}
 
   async create(createInspectionDto: CreateInspectionDto) {
@@ -55,35 +59,62 @@ export class InspectionService {
       user_id: user._id,
     });
 
-    return inspection.save();
-  }
-
-  async createEntryInspection(
-    createEntryInspectionDto: CreateEntryInspectionDTO,
-  ) {
-    const { address, name, real_state_id, areas, inspection_id, user_id } =
-      createEntryInspectionDto;
-
-    const isValid = isValidObjectId(real_state_id);
-
-    if (!isValid) {
-      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
-    }
-
-    const inspection = new this.entryInspectionModel({
+    const inspectionEntry = new this.entryInspectionModel({
       address,
-      areas,
-      inspection_id,
-      active: 'started',
+      active: 'pending',
       name,
+      date,
+      real_state_areas: null,
       real_state_id,
-      user_id: user_id,
+      user_id: user._id,
     });
 
-    return inspection.save();
+    await inspectionEntry.save();
+
+    return await inspection.save();
   }
 
-  async findByUserId(userId: string) {
+  public async updateEntryInspection(
+    inspectionId: ObjectId,
+    area: any,
+    image?: Express.Multer.File,
+  ) {
+    const inspectionEntry = await this.entryInspectionModel.findOne({
+      _id: inspectionId,
+    });
+
+    if (!inspectionEntry) {
+      throw new HttpException(
+        'Inspection Entry with this id not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const areasArray = [...inspectionEntry.areas];
+
+    if (image) {
+      const areaImagesArray = [];
+      const areaImage = await this.filesService.imageUpload({
+        dataBuffer: image.buffer,
+        fileName: image.originalname,
+        fileSize: image.size,
+        mimetype: image.mimetype,
+        urlFileName: `image-${inspectionEntry._id}-${area._id}`,
+      });
+      areaImagesArray.push(areaImage);
+      area.images = areaImagesArray;
+    }
+    areasArray.push(area);
+
+    await this.entryInspectionModel.updateOne(
+      { _id: inspectionEntry._id },
+      {
+        areas: areasArray,
+      },
+    );
+  }
+
+  public async findByUserId(userId: string) {
     const id = new mongoose.Types.ObjectId(userId);
 
     const inspections = await this.inspectionModel.find({
@@ -93,11 +124,11 @@ export class InspectionService {
     return inspections;
   }
 
-  findAll() {
-    return this.inspectionModel.find();
+  public async findAll() {
+    return await this.inspectionModel.find();
   }
 
-  async updateInspectionAreas(
+  public async updateInspectionAreas(
     inspectionId: string,
     userId: ObjectId,
     area: Area,

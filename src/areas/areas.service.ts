@@ -35,12 +35,12 @@ export class AreasService {
     return areas;
   }
 
-  public async uploadAreaImages(image: Express.Multer.File) {
-    await this.filesService.imageUpload({
-      dataBuffer: image.buffer,
-      fileName: image.originalname,
-      fileSize: image.size,
-      mimetype: image.mimetype,
-    });
-  }
+  // public async uploadAreaImages(image: Express.Multer.File) {
+  //   await this.filesService.imageUpload({
+  //     dataBuffer: image.buffer,
+  //     fileName: image.originalname,
+  //     fileSize: image.size,
+  //     mimetype: image.mimetype,
+  //   });
+  // }
 }

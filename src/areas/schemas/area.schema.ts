@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { InspectionPoint } from 'src/inspection-points/schemas/inspection-point.schema';
-import { File } from 'src/files/schemas/file.schema';
+import { FileDocument, File } from 'src/files/schemas/file.schema';
 
 export type AreaDocument = Area & Document;
 
@@ -23,7 +23,7 @@ export class Area {
   note?: string;
 
   @Prop({ type: mongoose.Types.DocumentArray, ref: 'file', required: false })
-  images?: File[];
+  images?: FileDocument[];
 
   @Prop({ type: mongoose.Types.DocumentArray, ref: 'inspection_points' })
   inspection_points: InspectionPoint[];

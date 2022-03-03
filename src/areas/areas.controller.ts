@@ -29,10 +29,10 @@ export class AreasController {
     return await this.areasService.getAll();
   }
 
-  @UseGuards(JwtAuthenticationGuard)
-  @Post('images')
-  @UseInterceptors(FileInterceptor('image'))
-  public async imagesUpload(@UploadedFile() image: Express.Multer.File) {
-    return await this.areasService.uploadAreaImages(image);
-  }
+  // @UseGuards(JwtAuthenticationGuard)
+  // @Post('images')
+  // @UseInterceptors(FileInterceptor('image'))
+  // public async imagesUpload(@UploadedFile() image: Express.Multer.File) {
+  //   return await this.areasService.uploadAreaImages(image);
+  // }
 }
