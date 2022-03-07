@@ -52,7 +52,7 @@ export class InspectionService {
       active: 'pending',
       name,
       date,
-      real_state_areas: null,
+      real_state_areas: [],
       real_state_id,
       user_id: user._id,
     });
@@ -62,7 +62,7 @@ export class InspectionService {
       active: 'pending',
       name,
       date,
-      real_state_areas: null,
+      real_state_areas: [],
       real_state_id,
       user_id: user._id,
     });
@@ -154,7 +154,19 @@ export class InspectionService {
 
     const updatedAreas = inspection.real_state_areas;
 
-    updatedAreas.push(area);
+    let areasAlreadyExist;
+
+    if (updatedAreas) {
+      areasAlreadyExist = updatedAreas.find((id) => id._id === area._id);
+    }
+
+    if (!areasAlreadyExist) {
+      updatedAreas.push(area);
+    } else {
+      const teste = updatedAreas.findIndex((id) => id._id === area._id);
+
+      updatedAreas[teste] = area;
+    }
 
     await this.inspectionModel.updateOne(
       {
