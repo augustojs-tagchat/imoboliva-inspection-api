@@ -31,6 +31,9 @@ export class EntryInspection {
 
   @Prop({ required: false })
   image_url: string;
+
+  @Prop({ required: false })
+  id_inspection: string;
 }
 
 export const EntryInspectionSchema =

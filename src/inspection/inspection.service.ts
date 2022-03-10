@@ -65,6 +65,7 @@ export class InspectionService {
       real_state_areas: [],
       real_state_id,
       user_id: user._id,
+      id_inspection: inspection._id,
     });
 
     await inspectionEntry.save();
@@ -163,9 +164,9 @@ export class InspectionService {
     if (!areasAlreadyExist) {
       updatedAreas.push(area);
     } else {
-      const teste = updatedAreas.findIndex((id) => id._id === area._id);
+      const indexArea = updatedAreas.findIndex((id) => id._id === area._id);
 
-      updatedAreas[teste] = area;
+      updatedAreas[indexArea] = area;
     }
 
     await this.inspectionModel.updateOne(
