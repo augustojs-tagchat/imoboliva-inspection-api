@@ -79,7 +79,7 @@ export class InspectionService {
     images?: Array<Express.Multer.File>,
   ) {
     const inspectionEntry = await this.entryInspectionModel.findOne({
-      _id: inspectionId,
+      id_inspection: inspectionId,
     });
 
     if (!inspectionEntry) {
@@ -89,7 +89,11 @@ export class InspectionService {
       );
     }
 
-    const areasArray = [...inspectionEntry.areas];
+    let areasArray = [];
+    if (inspectionEntry.areas) {
+      areasArray = [...inspectionEntry.areas];
+    }
+
     area.images = [];
 
     if (images) {

@@ -35,7 +35,7 @@ export class InspectionController {
   public async updateEntryInspection(
     @Body() updateEntryInspectionDto: UpdateEntryInspectionDTO,
     @Param() params: { inspection_id: ObjectId },
-    @UploadedFiles() image: Array<Express.Multer.File>,
+    @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
     const { _id, active, name, inspection_points, created_at, updated_at } =
       updateEntryInspectionDto;
@@ -49,14 +49,14 @@ export class InspectionController {
       updated_at,
     };
 
-    const inspectionPointsArray = JSON.parse(areaToJson.inspection_points);
+    const inspectionPointsArray = areaToJson.inspection_points;
 
     areaToJson.inspection_points = inspectionPointsArray;
 
     return await this.inspectionService.updateEntryInspection(
       params.inspection_id,
       areaToJson,
-      image,
+      images,
     );
   }
 
