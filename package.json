@@ -37,6 +37,7 @@
     "@types/passport-local": "^1.0.34",
     "aws-sdk": "^2.1084.0",
     "bcrypt": "^5.0.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "joi": "^17.6.0",
