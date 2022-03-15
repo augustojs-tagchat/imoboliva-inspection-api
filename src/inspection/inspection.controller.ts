@@ -19,12 +19,14 @@ import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.
 import { ObjectId } from 'mongoose';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
+import removeSpacesAndEspecialsCharacters from '../utils/removeSpacesAndEspecialsCharacters';
+
 @Controller('inspection')
 export class InspectionController {
   constructor(private readonly inspectionService: InspectionService) {}
 
-  @UseGuards(JwtAuthenticationGuard)
   @Post()
+  @UseGuards(JwtAuthenticationGuard)
   create(@Body() createInspectionDto: CreateInspectionDto) {
     return this.inspectionService.create(createInspectionDto);
   }
@@ -37,21 +39,21 @@ export class InspectionController {
     @Param() params: { inspection_id: ObjectId },
     @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
-    const { _id, active, name, inspection_points, created_at, updated_at } =
-      updateEntryInspectionDto;
+    const { _id, name, active, inspection_points } = updateEntryInspectionDto;
+
+    // const inspectionPointsFormatted = inspection_points.map((point) =>
+    //   removeSpacesAndEspecialsCharacters(point),
+    // );
+
+    const isActive = active === 'true';
+    const inspectionPointsArrayParsed = JSON.parse(inspection_points);
 
     const areaToJson = {
       _id,
-      active,
       name,
-      inspection_points,
-      created_at,
-      updated_at,
+      active: isActive,
+      inspection_points: inspectionPointsArrayParsed,
     };
-
-    const inspectionPointsArray = areaToJson.inspection_points;
-
-    areaToJson.inspection_points = inspectionPointsArray;
 
     return await this.inspectionService.updateEntryInspection(
       params.inspection_id,
