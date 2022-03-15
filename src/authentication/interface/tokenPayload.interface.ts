@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 export interface TokenPayload {
   userId: ObjectId;

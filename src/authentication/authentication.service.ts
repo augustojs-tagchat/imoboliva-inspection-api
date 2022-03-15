@@ -11,7 +11,7 @@ import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interface/tokenPayload.interface';
-import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class AuthenticationService {

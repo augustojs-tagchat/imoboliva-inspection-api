@@ -9,9 +9,9 @@ import {
   EntryInspectionDocument,
   EntryInspection,
 } from './schemas/entry-inspection.schema';
-import { ObjectId } from 'mongoose';
 import { Area } from 'src/areas/schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class InspectionService {
@@ -74,7 +74,7 @@ export class InspectionService {
   }
 
   public async updateEntryInspection(
-    inspectionId: ObjectId,
+    inspectionId: string,
     area: any,
     images?: Array<Express.Multer.File>,
   ) {
@@ -136,7 +136,7 @@ export class InspectionService {
 
   public async updateInspectionAreas(
     inspectionId: string,
-    userId: ObjectId,
+    userId: any,
     area: Area,
   ) {
     const inspection = await this.inspectionModel.findOne({
@@ -179,5 +179,34 @@ export class InspectionService {
       },
       { real_state_areas: updatedAreas },
     );
+  }
+
+  public async finishInspection(inspectionId: string) {
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspection = await this.inspectionModel.findOne({
+      _id: inspectionId,
+    });
+
+    if (!inspection) {
+      throw new HttpException(
+        'Inspection with this id does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.entryInspectionModel.findOneAndUpdate({
+      id_inspection: inspectionId,
+      active: 'done',
+    });
+
+    await this.inspectionModel.findOneAndUpdate({
+      _id: inspectionId,
+      active: 'done',
+    });
   }
 }

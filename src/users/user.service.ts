@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
-import { ObjectId, isValidObjectId } from 'mongoose';
 import { use } from 'passport';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {

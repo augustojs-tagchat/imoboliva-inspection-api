@@ -16,7 +16,6 @@ import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import { Area } from 'src/areas/schemas/area.schema';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
-import { ObjectId } from 'mongoose';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 import removeSpacesAndEspecialsCharacters from '../utils/removeSpacesAndEspecialsCharacters';
@@ -25,8 +24,8 @@ import removeSpacesAndEspecialsCharacters from '../utils/removeSpacesAndEspecial
 export class InspectionController {
   constructor(private readonly inspectionService: InspectionService) {}
 
-  @Post()
   @UseGuards(JwtAuthenticationGuard)
+  @Post()
   create(@Body() createInspectionDto: CreateInspectionDto) {
     return this.inspectionService.create(createInspectionDto);
   }
@@ -36,7 +35,7 @@ export class InspectionController {
   @UseInterceptors(FilesInterceptor('image'))
   public async updateEntryInspection(
     @Body() updateEntryInspectionDto: UpdateEntryInspectionDTO,
-    @Param() params: { inspection_id: ObjectId },
+    @Param() params: { inspection_id: string },
     @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
     const { _id, name, active, inspection_points } = updateEntryInspectionDto;
@@ -86,5 +85,11 @@ export class InspectionController {
       request.user._id,
       inspectionAreaDto,
     );
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch(':inspection_id/finish')
+  async finish(@Param() params: { inspection_id: string }) {
+    return await this.inspectionService.finishInspection(params.inspection_id);
   }
 }
