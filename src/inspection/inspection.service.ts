@@ -209,4 +209,26 @@ export class InspectionService {
       active: 'done',
     });
   }
+
+  async getExitInspection(inspectionId: string) {
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspection = await this.entryInspectionModel.findOne({
+      id_inspection: inspectionId,
+      active: 'done',
+    });
+
+    if (!inspection) {
+      throw new HttpException(
+        'Inspection done with this Id does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return inspection.areas;
+  }
 }

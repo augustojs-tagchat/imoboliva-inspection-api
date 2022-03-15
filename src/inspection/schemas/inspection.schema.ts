@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
 import { IAddress } from '../interface/address.interface';
 import { IRealState } from '../interface/real-state.interface';
 import { AreaDocument } from '../../areas/schemas/area.schema';
 import { Area } from '../../areas/schemas/area.schema';
+import { ObjectId } from 'mongodb';
 
 export type InspectionDocument = Inspection & Document;
 

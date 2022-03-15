@@ -92,4 +92,10 @@ export class InspectionController {
   async finish(@Param() params: { inspection_id: string }) {
     return await this.inspectionService.finishInspection(params.inspection_id);
   }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get(':inspection_id/exit')
+  async exit(@Param() params: { inspection_id: string }) {
+    return await this.inspectionService.getExitInspection(params.inspection_id);
+  }
 }
