@@ -19,6 +19,7 @@ import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 import removeSpacesAndEspecialsCharacters from '../utils/removeSpacesAndEspecialsCharacters';
+import { AddNewAreaDTO } from './dto/add-areas.dto';
 
 @Controller('inspection')
 export class InspectionController {
@@ -78,12 +79,12 @@ export class InspectionController {
   async update(
     @Req() request: RequestWithUser,
     @Param() params: { inspection_id: string },
-    @Body() inspectionAreaDto: Area,
+    @Body() addNewAreaDto: AddNewAreaDTO,
   ) {
     return await this.inspectionService.updateInspectionAreas(
       params.inspection_id,
       request.user._id,
-      inspectionAreaDto,
+      addNewAreaDto,
     );
   }
 

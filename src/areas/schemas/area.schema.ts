@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { InspectionPoint } from 'src/inspection-points/schemas/inspection-point.schema';
 import { FileDocument, File } from 'src/files/schemas/file.schema';
+import { IInspectionPoint } from 'src/inspection/interface/inspection-point.interface';
 
 export type AreaDocument = Area & Document;
 
@@ -26,7 +27,7 @@ export class Area {
   images?: FileDocument[];
 
   @Prop({ type: mongoose.Types.DocumentArray, ref: 'inspection_points' })
-  inspection_points: InspectionPoint[];
+  inspection_points: InspectionPoint[] | IInspectionPoint[];
 }
 
 export const AreaSchema = SchemaFactory.createForClass(Area);

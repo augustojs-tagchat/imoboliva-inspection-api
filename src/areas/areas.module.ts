@@ -12,5 +12,6 @@ import { FilesModule } from 'src/files/files.module';
   ],
   controllers: [AreasController],
   providers: [AreasService],
+  exports: [AreasService],
 })
 export class AreasModule {}

@@ -5,13 +5,11 @@ import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { UserService } from 'src/users/user.service';
 import mongoose from 'mongoose';
-import {
-  EntryInspectionDocument,
-  EntryInspection,
-} from './schemas/entry-inspection.schema';
 import { Area } from 'src/areas/schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
 import { ObjectId } from 'mongodb';
+import { AddNewAreaDTO } from './dto/add-areas.dto';
+import { AreasService } from 'src/areas/areas.service';
 
 @Injectable()
 export class InspectionService {
@@ -19,12 +17,11 @@ export class InspectionService {
     @InjectModel(Inspection.name)
     private readonly inspectionModel: Model<InspectionDocument>,
 
-    @InjectModel(EntryInspection.name)
-    private readonly entryInspectionModel: Model<EntryInspectionDocument>,
-
     private readonly userService: UserService,
 
     private readonly filesService: FilesService,
+
+    private readonly areasService: AreasService,
   ) {}
 
   async create(createInspectionDto: CreateInspectionDto) {
@@ -57,19 +54,6 @@ export class InspectionService {
       user_id: user._id,
     });
 
-    const inspectionEntry = new this.entryInspectionModel({
-      address,
-      active: 'pending',
-      name,
-      date,
-      real_state_areas: [],
-      real_state_id,
-      user_id: user._id,
-      id_inspection: inspection._id,
-    });
-
-    await inspectionEntry.save();
-
     return await inspection.save();
   }
 
@@ -78,8 +62,14 @@ export class InspectionService {
     area: any,
     images?: Array<Express.Multer.File>,
   ) {
-    const inspectionEntry = await this.entryInspectionModel.findOne({
-      id_inspection: inspectionId,
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspectionEntry = await this.inspectionModel.findOne({
+      _id: inspectionId,
     });
 
     if (!inspectionEntry) {
@@ -112,19 +102,23 @@ export class InspectionService {
 
     areasArray.push(area);
 
-    await this.entryInspectionModel.updateOne(
+    await this.inspectionModel.updateOne(
       { _id: inspectionEntry._id },
       {
-        areas: areasArray,
+        real_state_areas: areasArray,
       },
     );
   }
 
   public async findByUserId(userId: string) {
-    const id = new mongoose.Types.ObjectId(userId);
+    const idIsValid = ObjectId.isValid(userId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
 
     const inspections = await this.inspectionModel.find({
-      user_id: id,
+      user_id: userId,
     });
 
     return inspections;
@@ -136,9 +130,15 @@ export class InspectionService {
 
   public async updateInspectionAreas(
     inspectionId: string,
-    userId: any,
-    area: Area,
+    userId: string | ObjectId,
+    area: AddNewAreaDTO,
   ) {
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
     const inspection = await this.inspectionModel.findOne({
       _id: inspectionId,
     });
@@ -150,6 +150,25 @@ export class InspectionService {
       );
     }
 
+    const newArea = await this.areasService.findAreaById(area.area_id);
+
+    let areaAlreadyExists;
+
+    if (inspection.real_state_areas) {
+      areaAlreadyExists = inspection.real_state_areas.filter(
+        (inspection_areas) => String(inspection_areas._id) === area.area_id,
+      );
+    }
+
+    if (areaAlreadyExists.length > 0) {
+      throw new HttpException(
+        'Area already added to this inspection',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    newArea.inspection_points = area.inspection_points;
+
     if (!(String(inspection.user_id) === String(userId))) {
       throw new HttpException(
         'User does not have permission to edit this inspection',
@@ -157,27 +176,11 @@ export class InspectionService {
       );
     }
 
-    const updatedAreas = inspection.real_state_areas;
-
-    let areasAlreadyExist;
-
-    if (updatedAreas) {
-      areasAlreadyExist = updatedAreas.find((id) => id._id === area._id);
-    }
-
-    if (!areasAlreadyExist) {
-      updatedAreas.push(area);
-    } else {
-      const indexArea = updatedAreas.findIndex((id) => id._id === area._id);
-
-      updatedAreas[indexArea] = area;
-    }
-
     await this.inspectionModel.updateOne(
+      { _id: inspectionId },
       {
-        _id: inspection._id,
+        real_state_areas: newArea,
       },
-      { real_state_areas: updatedAreas },
     );
   }
 
@@ -199,15 +202,14 @@ export class InspectionService {
       );
     }
 
-    await this.entryInspectionModel.findOneAndUpdate({
-      id_inspection: inspectionId,
-      active: 'done',
-    });
-
-    await this.inspectionModel.findOneAndUpdate({
-      _id: inspectionId,
-      active: 'done',
-    });
+    await this.inspectionModel.updateOne(
+      {
+        _id: inspectionId,
+      },
+      {
+        active: 'done',
+      },
+    );
   }
 
   async getExitInspection(inspectionId: string) {
@@ -217,8 +219,8 @@ export class InspectionService {
       throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
     }
 
-    const inspection = await this.entryInspectionModel.findOne({
-      id_inspection: inspectionId,
+    const inspection = await this.inspectionModel.findOne({
+      _id: inspectionId,
       active: 'done',
     });
 
