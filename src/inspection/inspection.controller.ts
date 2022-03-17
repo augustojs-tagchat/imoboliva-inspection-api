@@ -39,25 +39,9 @@ export class InspectionController {
     @Param() params: { inspection_id: string },
     @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
-    const { _id, name, active, inspection_points } = updateEntryInspectionDto;
-
-    // const inspectionPointsFormatted = inspection_points.map((point) =>
-    //   removeSpacesAndEspecialsCharacters(point),
-    // );
-
-    const isActive = active === 'true';
-    const inspectionPointsArrayParsed = JSON.parse(inspection_points);
-
-    const areaToJson = {
-      _id,
-      name,
-      active: isActive,
-      inspection_points: inspectionPointsArrayParsed,
-    };
-
     return await this.inspectionService.updateEntryInspection(
       params.inspection_id,
-      areaToJson,
+      updateEntryInspectionDto,
       images,
     );
   }

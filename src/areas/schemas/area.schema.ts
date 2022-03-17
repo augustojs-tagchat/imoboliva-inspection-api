@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
 import { InspectionPoint } from 'src/inspection-points/schemas/inspection-point.schema';
 import { FileDocument, File } from 'src/files/schemas/file.schema';
 import { IInspectionPoint } from 'src/inspection/interface/inspection-point.interface';
+import { ObjectId } from 'mongodb';
 
 export type AreaDocument = Area & Document;
 

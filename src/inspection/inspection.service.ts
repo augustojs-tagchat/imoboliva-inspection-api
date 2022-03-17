@@ -4,12 +4,12 @@ import { Inspection, InspectionDocument } from './schemas/inspection.schema';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { UserService } from 'src/users/user.service';
-import mongoose from 'mongoose';
 import { Area } from 'src/areas/schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
 import { ObjectId } from 'mongodb';
 import { AddNewAreaDTO } from './dto/add-areas.dto';
 import { AreasService } from 'src/areas/areas.service';
+import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 
 @Injectable()
 export class InspectionService {
@@ -59,8 +59,8 @@ export class InspectionService {
 
   public async updateEntryInspection(
     inspectionId: string,
-    area: any,
-    images?: Array<Express.Multer.File>,
+    updateEntryInspectionDto: UpdateEntryInspectionDTO,
+    images: Array<Express.Multer.File>,
   ) {
     const idIsValid = ObjectId.isValid(inspectionId);
 
@@ -68,46 +68,73 @@ export class InspectionService {
       throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
     }
 
-    const inspectionEntry = await this.inspectionModel.findOne({
+    const inspection = await this.inspectionModel.findOne({
       _id: inspectionId,
     });
 
-    if (!inspectionEntry) {
+    if (!inspection) {
       throw new HttpException(
-        'Inspection Entry with this id not found',
-        HttpStatus.NOT_FOUND,
+        'Inspection with this id does not Id',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
-    let areasArray = [];
-    if (inspectionEntry.areas) {
-      areasArray = [...inspectionEntry.areas];
+    let selectedArea: Area;
+
+    inspection.real_state_areas.forEach((area) => {
+      if (String(area._id) === String(updateEntryInspectionDto.area_id)) {
+        selectedArea = area;
+      }
+    });
+
+    if (!selectedArea) {
+      throw new HttpException(
+        'Area with this Id in this inspection does not exists',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    area.images = [];
+    selectedArea.inspection_points.forEach((inspection_point) => {
+      if (
+        String(inspection_point._id) ===
+        String(updateEntryInspectionDto.inspection_point_id)
+      ) {
+        console.log(`achou ${inspection_point.description}`);
+        console.log('inspection_point', inspection_point);
+      } else {
+        console.log('não achou!');
+      }
+    });
 
-    if (images) {
-      const promisesImages = images.map(async (image) => {
-        return await this.filesService.imageUpload({
-          dataBuffer: image.buffer,
-          fileName: image.originalname,
-          fileSize: image.size,
-          mimetype: image.mimetype,
-          urlFileName: `${inspectionEntry._id}-${area._id}-${image.originalname}`,
-        });
-      });
+    // let areasArray = [];
+    // if (inspectionEntry.areas) {
+    //   areasArray = [...inspectionEntry.areas];
+    // }
 
-      area.images = await Promise.all(promisesImages);
-    }
+    // area.images = [];
 
-    areasArray.push(area);
+    // if (images) {
+    //   const promisesImages = images.map(async (image) => {
+    //     return await this.filesService.imageUpload({
+    //       dataBuffer: image.buffer,
+    //       fileName: image.originalname,
+    //       fileSize: image.size,
+    //       mimetype: image.mimetype,
+    //       urlFileName: `${inspectionEntry._id}-${area._id}-${image.originalname}`,
+    //     });
+    //   });
 
-    await this.inspectionModel.updateOne(
-      { _id: inspectionEntry._id },
-      {
-        real_state_areas: areasArray,
-      },
-    );
+    //   area.images = await Promise.all(promisesImages);
+    // }
+
+    // areasArray.push(area);
+
+    // await this.inspectionModel.updateOne(
+    //   { _id: inspectionEntry._id },
+    //   {
+    //     real_state_areas: areasArray,
+    //   },
+    // );
   }
 
   public async findByUserId(userId: string) {
@@ -176,10 +203,20 @@ export class InspectionService {
       );
     }
 
-    await this.inspectionModel.updateOne(
+    if (inspection.active === 'started') {
+      return await this.inspectionModel.updateOne(
+        { _id: inspectionId },
+        {
+          real_state_areas: newArea,
+        },
+      );
+    }
+
+    return await this.inspectionModel.updateOne(
       { _id: inspectionId },
       {
         real_state_areas: newArea,
+        active: 'started',
       },
     );
   }

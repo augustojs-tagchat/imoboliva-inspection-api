@@ -1,6 +1,18 @@
+import { IsNotEmpty, IsOptional } from 'class-validator';
+
 export class UpdateEntryInspectionDTO {
-  _id: string;
-  name: string;
-  active: string;
-  inspection_points: any;
+  @IsNotEmpty()
+  area_id: string;
+
+  inspection_point_id: string;
+
+  @IsOptional()
+  inspection_points: {
+    _id: string;
+    description: string;
+    entry: {
+      note: string;
+      selected_points: string[];
+    };
+  }[];
 }
