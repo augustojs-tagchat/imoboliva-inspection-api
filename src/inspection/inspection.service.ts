@@ -111,18 +111,6 @@ export class InspectionService {
       );
     }
 
-    selectedArea.inspection_points.forEach((inspection_point) => {
-      if (
-        String(inspection_point._id) ===
-        String(updateEntryInspectionDto.inspection_point_id)
-      ) {
-        console.log(`achou ${inspection_point.description}`);
-        console.log('inspection_point', inspection_point);
-      } else {
-        console.log('não achou!');
-      }
-    });
-
     // let areasArray = [];
     // if (inspectionEntry.areas) {
     //   areasArray = [...inspectionEntry.areas];

@@ -1,12 +1,10 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class UpdateEntryInspectionDTO {
   @IsNotEmpty()
   area_id: string;
 
-  inspection_point_id: string;
-
-  @IsOptional()
+  @IsNotEmpty()
   inspection_points: {
     _id: string;
     description: string;

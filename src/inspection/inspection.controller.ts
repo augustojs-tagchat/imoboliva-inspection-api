@@ -49,13 +49,21 @@ export class InspectionController {
     @Param() params: { inspection_id: string },
     @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
-    console.log('updateEntryInspectionDto', updateEntryInspectionDto);
+    const parsedInspectionPoints = JSON.parse(
+      String(updateEntryInspectionDto.inspection_points),
+    );
 
-    // return await this.inspectionService.updateEntryInspection(
-    //   params.inspection_id,
-    //   updateEntryInspectionDto,
-    //   images,
-    // );
+    const { data } = parsedInspectionPoints;
+
+    const dataArray = [...data];
+
+    updateEntryInspectionDto.inspection_points = dataArray;
+
+    return await this.inspectionService.updateEntryInspection(
+      params.inspection_id,
+      updateEntryInspectionDto,
+      images,
+    );
   }
 
   @UseGuards(JwtAuthenticationGuard)
