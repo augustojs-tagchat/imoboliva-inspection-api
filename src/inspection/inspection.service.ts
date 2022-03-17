@@ -10,6 +10,7 @@ import { ObjectId } from 'mongodb';
 import { AddNewAreaDTO } from './dto/add-areas.dto';
 import { AreasService } from 'src/areas/areas.service';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
+import { FileDocument } from 'src/files/schemas/file.schema';
 
 @Injectable()
 export class InspectionService {
@@ -24,7 +25,10 @@ export class InspectionService {
     private readonly areasService: AreasService,
   ) {}
 
-  async create(createInspectionDto: CreateInspectionDto) {
+  async create(
+    createInspectionDto: CreateInspectionDto,
+    image: Express.Multer.File,
+  ) {
     const { address, name, email, real_state_id, date } = createInspectionDto;
 
     const user = await this.userService.findByEmail(email);
@@ -44,6 +48,18 @@ export class InspectionService {
       throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
     }
 
+    let inspectionImage: FileDocument;
+
+    if (image) {
+      inspectionImage = await this.filesService.imageUpload({
+        dataBuffer: image.buffer,
+        fileName: image.originalname,
+        fileSize: image.size,
+        mimetype: image.mimetype,
+        urlFileName: `${real_state_id}-${image.originalname}`,
+      });
+    }
+
     const inspection = new this.inspectionModel({
       address,
       active: 'pending',
@@ -52,6 +68,7 @@ export class InspectionService {
       real_state_areas: [],
       real_state_id,
       user_id: user._id,
+      image: inspectionImage ? inspectionImage : null,
     });
 
     return await inspection.save();

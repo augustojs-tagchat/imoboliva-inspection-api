@@ -6,6 +6,7 @@ import { IRealState } from '../interface/real-state.interface';
 import { AreaDocument } from '../../areas/schemas/area.schema';
 import { Area } from '../../areas/schemas/area.schema';
 import { ObjectId } from 'mongodb';
+import { FileDocument } from 'src/files/schemas/file.schema';
 
 export type InspectionDocument = Inspection & Document;
 
@@ -40,8 +41,8 @@ export class Inspection {
   @Prop({ required: true, enum: ['pending', 'started', 'done'] })
   active: 'pending' | 'started' | 'done';
 
-  @Prop({ required: false })
-  image_url: string;
+  @Prop({ type: mongoose.Types.DocumentArray, ref: 'file', required: false })
+  image?: FileDocument;
 }
 
 export const InspectionSchema = SchemaFactory.createForClass(Inspection);
