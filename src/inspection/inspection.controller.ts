@@ -63,7 +63,7 @@ export class InspectionController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
-  @Get(':user_id')
+  @Get('user/:user_id')
   public async findOne(@Param() params: { user_id: string }) {
     return await this.inspectionService.findByUserId(params.user_id);
   }
