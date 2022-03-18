@@ -11,6 +11,7 @@ import { AddNewAreaDTO } from './dto/add-areas.dto';
 import { AreasService } from 'src/areas/areas.service';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import { FileDocument } from 'src/files/schemas/file.schema';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class InspectionService {
@@ -174,8 +175,10 @@ export class InspectionService {
       throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
     }
 
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
     const inspections = await this.inspectionModel.find({
-      user_id: userId,
+      user_id: userObjectId,
     });
 
     return inspections;
