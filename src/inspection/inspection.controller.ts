@@ -15,13 +15,9 @@ import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
-import { Area } from 'src/areas/schemas/area.schema';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-
-import removeSpacesAndEspecialsCharacters from '../utils/removeSpacesAndEspecialsCharacters';
 import { AddNewAreaDTO } from './dto/add-areas.dto';
-import { IAddress } from './interface/address.interface';
 
 @Controller('inspection')
 export class InspectionController {
@@ -43,7 +39,7 @@ export class InspectionController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Patch('entry/:inspection_id')
-  @UseInterceptors(FilesInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('images'))
   public async updateEntryInspection(
     @Body() updateEntryInspectionDto: UpdateEntryInspectionDTO,
     @Param() params: { inspection_id: string },

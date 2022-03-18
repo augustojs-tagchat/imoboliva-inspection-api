@@ -97,10 +97,14 @@ export class InspectionService {
     }
 
     let selectedArea: Area;
+    let updatedAreas;
 
     inspection.real_state_areas.forEach((area) => {
       if (String(area._id) === String(updateEntryInspectionDto.area_id)) {
         selectedArea = area;
+        updatedAreas = inspection.real_state_areas.filter(
+          (real_state_area) => real_state_area._id !== area._id,
+        );
       }
     });
 
@@ -111,35 +115,56 @@ export class InspectionService {
       );
     }
 
-    // let areasArray = [];
-    // if (inspectionEntry.areas) {
-    //   areasArray = [...inspectionEntry.areas];
-    // }
+    selectedArea.inspection_points.forEach((inspection_point) => {
+      const inspectionPointFound =
+        updateEntryInspectionDto.inspection_points.find(
+          (updateInspectionPoint) =>
+            updateInspectionPoint._id === String(inspection_point._id),
+        );
 
-    // area.images = [];
+      if (inspectionPointFound) {
+        inspection_point.entry = inspectionPointFound.entry;
+      }
+    });
 
-    // if (images) {
-    //   const promisesImages = images.map(async (image) => {
-    //     return await this.filesService.imageUpload({
-    //       dataBuffer: image.buffer,
-    //       fileName: image.originalname,
-    //       fileSize: image.size,
-    //       mimetype: image.mimetype,
-    //       urlFileName: `${inspectionEntry._id}-${area._id}-${image.originalname}`,
-    //     });
-    //   });
+    inspection.real_state_areas = updatedAreas;
 
-    //   area.images = await Promise.all(promisesImages);
-    // }
+    inspection.real_state_areas.push(selectedArea);
 
-    // areasArray.push(area);
+    if (images) {
+      const promisesImages = images.map(async (image) => {
+        return await this.filesService.imageUpload({
+          dataBuffer: image.buffer,
+          fileName: image.originalname,
+          fileSize: image.size,
+          mimetype: image.mimetype,
+          urlFileName: `${selectedArea._id}-${image.originalname}`,
+        });
+      });
 
-    // await this.inspectionModel.updateOne(
-    //   { _id: inspectionEntry._id },
-    //   {
-    //     real_state_areas: areasArray,
-    //   },
-    // );
+      const uploadedImages = await Promise.all(promisesImages);
+
+      if (selectedArea.images) {
+        selectedArea.images.push(...uploadedImages);
+      } else {
+        selectedArea.images = uploadedImages;
+      }
+
+      return await this.inspectionModel.updateOne(
+        { _id: inspection._id },
+        {
+          real_state_areas: inspection.real_state_areas,
+          images: selectedArea.images,
+        },
+      );
+    }
+
+    return await this.inspectionModel.updateOne(
+      { _id: inspection._id },
+      {
+        real_state_areas: inspection.real_state_areas,
+      },
+    );
   }
 
   public async findByUserId(userId: string) {
@@ -208,11 +233,13 @@ export class InspectionService {
       );
     }
 
+    inspection.real_state_areas.push(newArea);
+
     if (inspection.active === 'started') {
       return await this.inspectionModel.updateOne(
         { _id: inspectionId },
         {
-          real_state_areas: newArea,
+          real_state_areas: inspection.real_state_areas,
         },
       );
     }
