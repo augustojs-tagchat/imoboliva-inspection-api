@@ -1,6 +1,4 @@
 import { IsString, IsNotEmpty, ValidateNested, IsArray } from 'class-validator';
-import { Type } from 'class-transformer';
-import { InspectionPoint } from 'src/inspection-points/schemas/inspection-point.schema';
 import { IInspectionPoint } from '../interface/inspection-point.interface';
 
 export class AddNewAreaDTO {
@@ -11,6 +9,5 @@ export class AddNewAreaDTO {
   @IsNotEmpty()
   @IsArray()
   @ValidateNested()
-  @Type(() => IInspectionPoint)
   inspection_points: IInspectionPoint[];
 }
