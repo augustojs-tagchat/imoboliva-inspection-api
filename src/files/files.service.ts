@@ -12,7 +12,7 @@ export class FilesService {
     private readonly fileModel: Model<FileDocument>,
   ) {}
 
-  async imageUpload(
+  async uploadFile(
     fileUploadDto: FileUploadDTO,
     inspectionId?: string,
     areaId?: string,
