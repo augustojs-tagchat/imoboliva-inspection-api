@@ -52,13 +52,36 @@ export class InspectionService {
     let inspectionImage: FileDocument;
 
     if (image) {
-      inspectionImage = await this.filesService.imageUpload({
-        dataBuffer: image.buffer,
-        fileName: image.originalname,
-        fileSize: image.size,
-        mimetype: image.mimetype,
-        urlFileName: `${real_state_id}-${image.originalname}`,
+      const inspection = new this.inspectionModel({
+        address,
+        active: 'pending',
+        name,
+        date,
+        real_state_areas: [],
+        real_state_id,
+        user_id: user._id,
+        image: null,
       });
+
+      inspectionImage = await this.filesService.imageUpload(
+        {
+          dataBuffer: image.buffer,
+          fileName: image.originalname,
+          fileSize: image.size,
+          mimetype: image.mimetype,
+          urlFileName: `${real_state_id}-${image.originalname}`,
+        },
+        inspection._id,
+      );
+
+      await inspection.save();
+
+      return await this.inspectionModel.updateOne(
+        { _id: inspection._id },
+        {
+          image: inspectionImage,
+        },
+      );
     }
 
     const inspection = new this.inspectionModel({
@@ -69,7 +92,7 @@ export class InspectionService {
       real_state_areas: [],
       real_state_id,
       user_id: user._id,
-      image: inspectionImage ? inspectionImage : null,
+      image: null,
     });
 
     return await inspection.save();
@@ -134,13 +157,17 @@ export class InspectionService {
 
     if (images) {
       const promisesImages = images.map(async (image) => {
-        return await this.filesService.imageUpload({
-          dataBuffer: image.buffer,
-          fileName: image.originalname,
-          fileSize: image.size,
-          mimetype: image.mimetype,
-          urlFileName: `${selectedArea._id}-${image.originalname}`,
-        });
+        return await this.filesService.imageUpload(
+          {
+            dataBuffer: image.buffer,
+            fileName: image.originalname,
+            fileSize: image.size,
+            mimetype: image.mimetype,
+            urlFileName: `${selectedArea._id}-${image.originalname}`,
+          },
+          inspection._id,
+          String(selectedArea._id),
+        );
       });
 
       const uploadedImages = await Promise.all(promisesImages);
