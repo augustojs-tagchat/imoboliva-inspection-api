@@ -13,7 +13,7 @@ export class FilesService {
   ) {}
 
   async imageUpload(fileUploadDto: FileUploadDTO) {
-    const s3 = new S3({
+    const s3: S3 = new S3({
       endpoint: process.env.PUBLIC_DO_SPACES_ENDPOINT,
       accessKeyId: process.env.PUBLIC_DO_SPACES_KEY,
       secretAccessKey: process.env.PUBLIC_DO_SPACES_SECRET,
@@ -28,11 +28,12 @@ export class FilesService {
     };
 
     return new Promise<FileDocument>((resolve, reject) => {
-      s3.putObject(body, async (err) => {
+      s3.upload(body, async (err, data) => {
         if (err) {
           reject(err);
         } else {
-          const urlFile = `https://${process.env.PUBLIC_DO_SPACES_NAME}.${process.env.PUBLIC_DO_SPACES_ENDPOINT}/${fileUploadDto.urlFileName}`;
+          const cdnPath = data.Location.split('.com/').pop();
+          const urlFile = `${process.env.PUBLIC_CDN_URL}${cdnPath}`;
 
           const newFile = new this.fileModel({
             key: fileUploadDto.fileName,
