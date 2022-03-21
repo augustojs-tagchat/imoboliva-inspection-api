@@ -63,7 +63,7 @@ export class InspectionService {
         image: null,
       });
 
-      inspectionImage = await this.filesService.imageUpload(
+      inspectionImage = await this.filesService.uploadFile(
         {
           dataBuffer: image.buffer,
           fileName: image.originalname,
@@ -157,7 +157,7 @@ export class InspectionService {
 
     if (images) {
       const promisesImages = images.map(async (image) => {
-        return await this.filesService.imageUpload(
+        return await this.filesService.uploadFile(
           {
             dataBuffer: image.buffer,
             fileName: image.originalname,

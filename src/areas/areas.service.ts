@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { Model } from 'mongoose';
-import { isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Area, AreaDocument } from './schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
@@ -54,13 +53,4 @@ export class AreasService {
 
     return area;
   }
-
-  // public async uploadAreaImages(image: Express.Multer.File) {
-  //   await this.filesService.imageUpload({
-  //     dataBuffer: image.buffer,
-  //     fileName: image.originalname,
-  //     fileSize: image.size,
-  //     mimetype: image.mimetype,
-  //   });
-  // }
 }
