@@ -12,15 +12,23 @@ export class FilesService {
     private readonly fileModel: Model<FileDocument>,
   ) {}
 
-  async imageUpload(fileUploadDto: FileUploadDTO) {
+  async imageUpload(
+    fileUploadDto: FileUploadDTO,
+    inspectionId?: string,
+    areaId?: string,
+  ) {
     const s3: S3 = new S3({
       endpoint: process.env.PUBLIC_DO_SPACES_ENDPOINT,
       accessKeyId: process.env.PUBLIC_DO_SPACES_KEY,
       secretAccessKey: process.env.PUBLIC_DO_SPACES_SECRET,
     });
 
+    const cdnBucketPath = areaId
+      ? `${process.env.PUBLIC_DO_SPACES_NAME}/imob-oliva/inspection/${inspectionId}/areas/${areaId}`
+      : `${process.env.PUBLIC_DO_SPACES_NAME}/imob-oliva/inspection/${inspectionId}`;
+
     const body = {
-      Bucket: `${process.env.PUBLIC_DO_SPACES_NAME}/imob-oliva/inspection/areas`,
+      Bucket: cdnBucketPath,
       Key: fileUploadDto.fileName,
       ACL: 'public-read',
       Body: fileUploadDto.dataBuffer,
