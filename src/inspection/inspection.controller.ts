@@ -14,6 +14,7 @@ import {
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
+import { UpdateExitInspectionDTO } from './dto/update-exit-inspection.dto';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -58,6 +59,31 @@ export class InspectionController {
     return await this.inspectionService.updateEntryInspection(
       params.inspection_id,
       updateEntryInspectionDto,
+      images,
+    );
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch('exit/:inspection_id')
+  @UseInterceptors(FilesInterceptor('images'))
+  public async updateExitInspection(
+    @Body() updateExitInspectionDTO: UpdateExitInspectionDTO,
+    @Param() params: { inspection_id: string },
+    @UploadedFiles() images: Array<Express.Multer.File>,
+  ) {
+    const parsedInspectionPoints = JSON.parse(
+      String(updateExitInspectionDTO.inspection_points),
+    );
+
+    const { data } = parsedInspectionPoints;
+
+    const dataArray = [...data];
+
+    updateExitInspectionDTO.inspection_points = dataArray;
+
+    return await this.inspectionService.updateExitInspection(
+      params.inspection_id,
+      updateExitInspectionDTO,
       images,
     );
   }

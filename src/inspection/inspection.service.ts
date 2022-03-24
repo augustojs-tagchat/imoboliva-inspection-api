@@ -12,6 +12,7 @@ import { AreasService } from 'src/areas/areas.service';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import { FileDocument } from 'src/files/schemas/file.schema';
 import mongoose from 'mongoose';
+import { UpdateExitInspectionDTO } from './dto/update-exit-inspection.dto';
 
 @Injectable()
 export class InspectionService {
@@ -139,6 +140,8 @@ export class InspectionService {
       );
     }
 
+    selectedArea.active = true;
+
     selectedArea.inspection_points.forEach((inspection_point) => {
       const inspectionPointFound =
         updateEntryInspectionDto.inspection_points.find(
@@ -148,6 +151,105 @@ export class InspectionService {
 
       if (inspectionPointFound) {
         inspection_point.entry = inspectionPointFound.entry;
+      }
+    });
+
+    inspection.real_state_areas = updatedAreas;
+
+    inspection.real_state_areas.push(selectedArea);
+
+    if (images) {
+      const promisesImages = images.map(async (image) => {
+        return await this.filesService.uploadFile(
+          {
+            dataBuffer: image.buffer,
+            fileName: image.originalname,
+            fileSize: image.size,
+            mimetype: image.mimetype,
+            urlFileName: `${selectedArea._id}-${image.originalname}`,
+          },
+          inspection._id,
+          String(selectedArea._id),
+        );
+      });
+
+      const uploadedImages = await Promise.all(promisesImages);
+
+      if (selectedArea.images) {
+        selectedArea.images.push(...uploadedImages);
+      } else {
+        selectedArea.images = uploadedImages;
+      }
+
+      return await this.inspectionModel.updateOne(
+        { _id: inspection._id },
+        {
+          real_state_areas: inspection.real_state_areas,
+          images: selectedArea.images,
+        },
+      );
+    }
+
+    return await this.inspectionModel.updateOne(
+      { _id: inspection._id },
+      {
+        real_state_areas: inspection.real_state_areas,
+      },
+    );
+  }
+
+  public async updateExitInspection(
+    inspectionId: string,
+    updateExitInspectionDTO: UpdateExitInspectionDTO,
+    images: Array<Express.Multer.File>,
+  ) {
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspection = await this.inspectionModel.findOne({
+      _id: inspectionId,
+    });
+
+    if (!inspection) {
+      throw new HttpException(
+        'Inspection with this id does not Id',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let selectedArea: Area;
+    let updatedAreas;
+
+    inspection.real_state_areas.forEach((area) => {
+      if (String(area._id) === String(updateExitInspectionDTO.area_id)) {
+        selectedArea = area;
+        updatedAreas = inspection.real_state_areas.filter(
+          (real_state_area) => real_state_area._id !== area._id,
+        );
+      }
+    });
+
+    if (!selectedArea) {
+      throw new HttpException(
+        'Area with this Id in this inspection does not exists',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    selectedArea.active = true;
+
+    selectedArea.inspection_points.forEach((inspection_point) => {
+      const inspectionPointFound =
+        updateExitInspectionDTO.inspection_points.find(
+          (updateInspectionPoint) =>
+            updateInspectionPoint._id === String(inspection_point._id),
+        );
+
+      if (inspectionPointFound) {
+        inspection_point.exit = inspectionPointFound.exit;
       }
     });
 
@@ -301,12 +403,15 @@ export class InspectionService {
       );
     }
 
+    inspection.real_state_areas.forEach((area) => (area.active = false));
+
     await this.inspectionModel.updateOne(
       {
         _id: inspectionId,
       },
       {
         active: 'done',
+        real_state_areas: inspection.real_state_areas,
       },
     );
   }
