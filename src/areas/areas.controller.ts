@@ -1,17 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Post, Body, Get, UseGuards, Patch } from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
-import { Express } from 'express';
 
 @Controller('areas')
 export class AreasController {
@@ -29,10 +19,9 @@ export class AreasController {
     return await this.areasService.getAll();
   }
 
-  // @UseGuards(JwtAuthenticationGuard)
-  // @Post('images')
-  // @UseInterceptors(FileInterceptor('image'))
-  // public async imagesUpload(@UploadedFile() image: Express.Multer.File) {
-  //   return await this.areasService.uploadAreaImages(image);
-  // }
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch()
+  public async update() {
+    return await this.areasService.updateArea();
+  }
 }

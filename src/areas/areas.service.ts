@@ -11,8 +11,6 @@ export class AreasService {
   constructor(
     @InjectModel(Area.name)
     private readonly areaModel: Model<AreaDocument>,
-
-    private readonly filesService: FilesService,
   ) {}
 
   public async create(createAreaDto: CreateAreaDto) {
@@ -52,5 +50,9 @@ export class AreasService {
     }
 
     return area;
+  }
+
+  public async updateArea() {
+    //
   }
 }
