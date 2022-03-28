@@ -1,5 +1,4 @@
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { ObjectId } from 'mongodb';
 
 class Entry {
   selected_points: string[];
@@ -12,7 +11,9 @@ class Exit {
 }
 
 export class IInspectionPoints {
-  _id: string | ObjectId;
+  @IsNotEmpty()
+  @IsString()
+  _id: string;
 
   @IsString()
   @IsNotEmpty()
