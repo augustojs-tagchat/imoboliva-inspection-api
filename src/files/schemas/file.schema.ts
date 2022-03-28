@@ -22,6 +22,9 @@ export class File {
 
   @Prop()
   mimetype: string;
+
+  @Prop()
+  inspection_point_id: string;
 }
 
 export const FileSchema = SchemaFactory.createForClass(File);

@@ -50,4 +50,13 @@ export class InspectionPointsController {
       params.inspection_point_id,
     );
   }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch(':/')
+  public async images(
+    @Param() params: { inspection_point_id: string },
+    @Body() body: any,
+  ) {
+    //
+  }
 }

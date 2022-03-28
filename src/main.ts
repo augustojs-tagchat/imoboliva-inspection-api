@@ -9,6 +9,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
+  app.enableCors();
   await app.listen(3333);
   console.log('Server running! 🚀');
 }
