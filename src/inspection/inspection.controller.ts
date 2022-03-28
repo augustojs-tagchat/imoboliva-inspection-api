@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   UploadedFile,
+  Delete,
 } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
@@ -19,6 +20,7 @@ import RequestWithUser from 'src/authentication/interface/requestWithUser.interf
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AddNewAreaDTO } from './dto/add-areas.dto';
+import RoleGuard from 'src/authentication/guard/role.guard';
 
 @Controller('inspection')
 export class InspectionController {
@@ -124,5 +126,12 @@ export class InspectionController {
   @Get(':inspection_id/exit')
   async exit(@Param() params: { inspection_id: string }) {
     return await this.inspectionService.getExitInspection(params.inspection_id);
+  }
+
+  @UseGuards(RoleGuard('admin'))
+  @UseGuards(JwtAuthenticationGuard)
+  @Delete(':inspection_id')
+  public async delete(@Param() params: { inspection_id: string }) {
+    return await this.inspectionService.deleteInspection(params.inspection_id);
   }
 }

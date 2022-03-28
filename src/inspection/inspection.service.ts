@@ -437,4 +437,8 @@ export class InspectionService {
 
     return inspection.areas;
   }
+
+  public async deleteInspection(inspectionId: string) {
+    //
+  }
 }
