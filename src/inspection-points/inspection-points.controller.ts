@@ -7,11 +7,15 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { InspectionPointsService } from './inspection-points.service';
 import { CreateInspectionPointDto } from './dto/create-inspection-point.dto';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { UpdateInspectionPointDTO } from './dto/update-inspection-point.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { UploadInspectionPointImagesDTO } from './dto/upload-inspection-point-images.dto';
 
 @Controller('inspection-points')
 export class InspectionPointsController {
@@ -52,11 +56,17 @@ export class InspectionPointsController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
-  @Patch(':/')
+  @Patch(':inspection_point_id/images')
+  @UseInterceptors(FilesInterceptor('images'))
   public async images(
     @Param() params: { inspection_point_id: string },
-    @Body() body: any,
+    @Body() uploadInspectionPointImagesDto: UploadInspectionPointImagesDTO,
+    @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
-    //
+    return await this.inspectionPointsService.uploadImages(
+      params.inspection_point_id,
+      images,
+      uploadInspectionPointImagesDto,
+    );
   }
 }

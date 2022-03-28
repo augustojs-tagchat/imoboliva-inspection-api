@@ -9,7 +9,6 @@ import {
   EntryInspection,
 } from './schemas/entry-inspection.schema';
 import { FilesModule } from 'src/files/files.module';
-import { AreasService } from 'src/areas/areas.service';
 import { AreasModule } from 'src/areas/areas.module';
 
 @Module({
@@ -24,5 +23,6 @@ import { AreasModule } from 'src/areas/areas.module';
   ],
   controllers: [InspectionController],
   providers: [InspectionService],
+  exports: [InspectionService],
 })
 export class InspectionModule {}

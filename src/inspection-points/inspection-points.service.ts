@@ -8,13 +8,25 @@ import {
 } from './schemas/inspection-point.schema';
 import { UpdateInspectionPointDTO } from './dto/update-inspection-point.dto';
 import { ObjectId } from 'mongodb';
+import { UploadInspectionPointImagesDTO } from './dto/upload-inspection-point-images.dto';
+import { InspectionService } from 'src/inspection/inspection.service';
 
 @Injectable()
 export class InspectionPointsService {
   constructor(
     @InjectModel(InspectionPoint.name)
-    private inspectionPointModel: Model<InspectionPointDocument>,
+    private readonly inspectionPointModel: Model<InspectionPointDocument>,
+
+    private readonly inspectionService: InspectionService,
   ) {}
+
+  private validObjectId(id: string) {
+    const idIsValid = ObjectId.isValid(id);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+  }
 
   public async findById(inspectionPointId: string) {
     const idIsValid = ObjectId.isValid(inspectionPointId);
@@ -68,5 +80,51 @@ export class InspectionPointsService {
     return await this.inspectionPointModel.deleteOne({
       _id: inspectionPoint._id,
     });
+  }
+
+  public async uploadImages(
+    inspectionPointId: string,
+    images: Array<Express.Multer.File>,
+    uploadInspectionPointImagesDto: UploadInspectionPointImagesDTO,
+  ) {
+    this.validObjectId(inspectionPointId);
+
+    this.validObjectId(uploadInspectionPointImagesDto.area_id);
+
+    this.validObjectId(uploadInspectionPointImagesDto.inspection_id);
+
+    const inspection = await this.inspectionService.findById(
+      uploadInspectionPointImagesDto.inspection_id,
+    );
+
+    const { real_state_areas } = inspection;
+
+    // select area
+    const selectedArea = real_state_areas.find(
+      (area) => String(area._id) === uploadInspectionPointImagesDto.area_id,
+    );
+
+    if (!selectedArea) {
+      throw new HttpException(
+        'Area with this id does not exist in this inspection ',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    console.log('selectedArea', selectedArea);
+
+    // select inspection point
+    const selectedInspectionPoint = selectedArea.inspection_points.find(
+      (inspectionPoint) => String(inspectionPoint._id) === inspectionPointId,
+    );
+
+    if (!selectedInspectionPoint) {
+      throw new HttpException(
+        'Inspection point with this id does not exist in this inspection ',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    console.log('selectedInspectionPoint', selectedInspectionPoint);
   }
 }
