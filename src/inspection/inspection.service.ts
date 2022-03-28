@@ -27,6 +27,25 @@ export class InspectionService {
     private readonly areasService: AreasService,
   ) {}
 
+  public async findById(inspectionId: string) {
+    const idIsValid = ObjectId.isValid(inspectionId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const inspection = await this.inspectionModel.findById(inspectionId);
+
+    if (!inspection) {
+      throw new HttpException(
+        'Inspection with this Id does not exist!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return inspection;
+  }
+
   async create(
     createInspectionDto: CreateInspectionDto,
     image: Express.Multer.File,
@@ -436,5 +455,11 @@ export class InspectionService {
     }
 
     return inspection.areas;
+  }
+
+  public async deleteInspection(inspectionId: string) {
+    const inspection = await this.findById(inspectionId);
+
+    return await this.inspectionModel.deleteOne({ _id: inspection._id });
   }
 }
