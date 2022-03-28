@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Area, AreaDocument } from './schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
 import { ObjectId } from 'mongodb';
+import { UpdateAreaDTO } from './dto/update-area.dto';
 
 @Injectable()
 export class AreasService {
@@ -52,7 +53,20 @@ export class AreasService {
     return area;
   }
 
-  public async updateArea() {
-    //
+  public async updateArea(areaId: string, updateAreaDto: UpdateAreaDTO) {
+    const area = await this.findAreaById(areaId);
+
+    return await this.areaModel.updateOne(
+      { _id: area._id },
+      { ...updateAreaDto },
+    );
+  }
+
+  public async deleteArea(areaId: string) {
+    const area = await this.findAreaById(areaId);
+
+    return await this.areaModel.deleteOne({
+      _id: area._id,
+    });
   }
 }
