@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
-import { use } from 'passport';
 import { ObjectId } from 'mongodb';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -44,7 +44,7 @@ export class UserService {
     );
   }
 
-  public async findById(userId: ObjectId) {
+  public async findById(userId: ObjectId | string) {
     const appraiser = await this.userModel.findOne({ _id: userId });
 
     if (appraiser) {
@@ -54,6 +54,30 @@ export class UserService {
     throw new HttpException(
       'Appraiser with this id does not exist',
       HttpStatus.NOT_FOUND,
+    );
+  }
+
+  public async updateUser(userId: string, updateUserDto: UpdateUserDTO) {
+    const idIsValid = ObjectId.isValid(userId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        'User with this id does not exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        ...updateUserDto,
+      },
     );
   }
 }
