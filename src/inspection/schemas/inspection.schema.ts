@@ -38,8 +38,11 @@ export class Inspection {
   @Prop()
   real_state_areas: Area[] | null;
 
-  @Prop({ required: true, enum: ['pending', 'started', 'done'] })
-  active: 'pending' | 'started' | 'done';
+  @Prop({
+    required: true,
+    enum: ['pending', 'started', 'entry_done', 'exit_done'],
+  })
+  active: 'pending' | 'started' | 'entry_done' | 'exit_done';
 
   @Prop({ type: mongoose.Types.DocumentArray, ref: 'file', required: false })
   image?: FileDocument;
