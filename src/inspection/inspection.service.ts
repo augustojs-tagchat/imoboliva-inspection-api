@@ -405,12 +405,14 @@ export class InspectionService {
 
     inspection.real_state_areas.forEach((area) => (area.active = false));
 
+    const active = inspection.active === 'started' ? 'entry_done' : 'exit_done';
+
     await this.inspectionModel.updateOne(
       {
         _id: inspectionId,
       },
       {
-        active: 'done',
+        active,
         real_state_areas: inspection.real_state_areas,
       },
     );
