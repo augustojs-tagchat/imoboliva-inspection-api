@@ -18,6 +18,10 @@ export class UserService {
     return appraiser.save();
   }
 
+  public async findAll() {
+    return await this.userModel.find();
+  }
+
   public async findByEmail(email: string) {
     const user = await this.userModel.findOne({ email: email });
 
@@ -79,5 +83,24 @@ export class UserService {
         ...updateUserDto,
       },
     );
+  }
+
+  public async deleteUser(userId: string) {
+    const idIsValid = ObjectId.isValid(userId);
+
+    if (!idIsValid) {
+      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        'User with this id does not exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userModel.deleteOne({ _id: user._id });
   }
 }
