@@ -1,21 +1,20 @@
 import { Type } from 'class-transformer';
 import {
   IsString,
-  IsNotEmpty,
   IsOptional,
-  IsArray,
   ValidateNested,
+  IsArray,
+  MinLength,
+  ArrayNotEmpty,
 } from 'class-validator';
 import { IInspectionPoints } from 'src/inspection-points/interfaces/inspection-points.interface';
 
-export class CreateAreaDto {
+export class UpdateAreaDTO {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   name: string;
 
-  active: boolean;
-
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => IInspectionPoints)

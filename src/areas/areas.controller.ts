@@ -4,14 +4,14 @@ import {
   Body,
   Get,
   UseGuards,
-  UseInterceptors,
-  UploadedFile,
+  Patch,
+  Param,
+  Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
-import { Express } from 'express';
+import { UpdateAreaDTO } from './dto/update-area.dto';
 
 @Controller('areas')
 export class AreasController {
@@ -29,10 +29,18 @@ export class AreasController {
     return await this.areasService.getAll();
   }
 
-  // @UseGuards(JwtAuthenticationGuard)
-  // @Post('images')
-  // @UseInterceptors(FileInterceptor('image'))
-  // public async imagesUpload(@UploadedFile() image: Express.Multer.File) {
-  //   return await this.areasService.uploadAreaImages(image);
-  // }
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch(':area_id')
+  public async update(
+    @Param() params: { area_id: string },
+    @Body() updateAreaDto: UpdateAreaDTO,
+  ) {
+    return await this.areasService.updateArea(params.area_id, updateAreaDto);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Delete(':area_id')
+  public async delete(@Param() params: { area_id: string }) {
+    return await this.areasService.deleteArea(params.area_id);
+  }
 }

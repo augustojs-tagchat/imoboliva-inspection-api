@@ -30,10 +30,10 @@ export class InspectionPoint {
   @Prop()
   active: boolean;
 
-  @Prop({ type: Entry })
+  @Prop({ type: Entry, default: { selected_points: [], note: '' } })
   entry: Entry;
 
-  @Prop({ type: Exit })
+  @Prop({ type: Exit, default: { selected_points: [], note: '' } })
   exit: Exit;
 }
 
