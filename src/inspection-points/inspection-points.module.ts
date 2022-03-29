@@ -7,13 +7,20 @@ import {
   InspectionPoint,
 } from './schemas/inspection-point.schema';
 import { InspectionModule } from 'src/inspection/inspection.module';
+import { FilesModule } from 'src/files/files.module';
+import {
+  Inspection,
+  InspectionSchema,
+} from 'src/inspection/schemas/inspection.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { schema: InspectionPointSchema, name: InspectionPoint.name },
+      { schema: InspectionSchema, name: Inspection.name },
     ]),
     InspectionModule,
+    FilesModule,
   ],
   controllers: [InspectionPointsController],
   providers: [InspectionPointsService],

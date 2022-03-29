@@ -10,6 +10,13 @@ import { UpdateInspectionPointDTO } from './dto/update-inspection-point.dto';
 import { ObjectId } from 'mongodb';
 import { UploadInspectionPointImagesDTO } from './dto/upload-inspection-point-images.dto';
 import { InspectionService } from 'src/inspection/inspection.service';
+import { FilesService } from 'src/files/files.service';
+import { FileDocument } from 'src/files/schemas/file.schema';
+import { Area } from 'src/areas/schemas/area.schema';
+import {
+  Inspection,
+  InspectionDocument,
+} from 'src/inspection/schemas/inspection.schema';
 
 @Injectable()
 export class InspectionPointsService {
@@ -17,7 +24,12 @@ export class InspectionPointsService {
     @InjectModel(InspectionPoint.name)
     private readonly inspectionPointModel: Model<InspectionPointDocument>,
 
+    @InjectModel(Inspection.name)
+    private readonly inspectionModel: Model<InspectionDocument>,
+
     private readonly inspectionService: InspectionService,
+
+    private readonly filesService: FilesService,
   ) {}
 
   private validObjectId(id: string) {
@@ -100,7 +112,7 @@ export class InspectionPointsService {
     const { real_state_areas } = inspection;
 
     // select area
-    const selectedArea = real_state_areas.find(
+    const selectedArea: Area = real_state_areas.find(
       (area) => String(area._id) === uploadInspectionPointImagesDto.area_id,
     );
 
@@ -111,7 +123,9 @@ export class InspectionPointsService {
       );
     }
 
-    console.log('selectedArea', selectedArea);
+    const filteredAreas = real_state_areas.filter(
+      (area) => String(area._id) !== uploadInspectionPointImagesDto.area_id,
+    );
 
     // select inspection point
     const selectedInspectionPoint = selectedArea.inspection_points.find(
@@ -125,6 +139,45 @@ export class InspectionPointsService {
       );
     }
 
-    console.log('selectedInspectionPoint', selectedInspectionPoint);
+    const filteredInspectionPoints = selectedArea.inspection_points.filter(
+      (inspectionPoint) =>
+        String(inspectionPoint._id) !==
+        uploadInspectionPointImagesDto.inspection_id,
+    );
+
+    if (!selectedInspectionPoint.images) {
+      selectedInspectionPoint.images = [];
+    }
+
+    const promisesImages = images.map(async (image) => {
+      return await this.filesService.uploadFile(
+        {
+          dataBuffer: image.buffer,
+          fileName: image.originalname,
+          fileSize: image.size,
+          mimetype: image.mimetype,
+          urlFileName: `${selectedArea._id}-${image.originalname}`,
+        },
+        inspection._id,
+        String(selectedArea._id),
+      );
+    });
+
+    const uploadedImages = await Promise.all(promisesImages);
+
+    selectedInspectionPoint.images.push(...uploadedImages);
+
+    filteredInspectionPoints.push(selectedInspectionPoint);
+
+    selectedArea.inspection_points = filteredInspectionPoints;
+
+    filteredAreas.push(selectedArea);
+
+    return await this.inspectionModel.updateOne(
+      { _id: inspection._id },
+      {
+        real_state_areas: filteredAreas,
+      },
+    );
   }
 }
