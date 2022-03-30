@@ -5,6 +5,7 @@ import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { validObjectId } from 'src/utils/validObjectId';
 
 @Injectable()
 export class UserService {
@@ -19,7 +20,16 @@ export class UserService {
   }
 
   public async findAll() {
-    return await this.userModel.find();
+    let usersArray = [];
+
+    const users = await this.userModel.find();
+
+    usersArray = users.map((user) => {
+      user.password = undefined;
+      return user;
+    });
+
+    return usersArray;
   }
 
   public async findByEmail(email: string) {
@@ -102,5 +112,20 @@ export class UserService {
     }
 
     return await this.userModel.deleteOne({ _id: user._id });
+  }
+
+  public async userToAdmin(userId: string) {
+    validObjectId(userId);
+
+    const user = await this.userModel.findOne({ _id: userId });
+
+    if (!user) {
+      throw new HttpException(
+        'User with this id does not exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userModel.updateOne({ _id: user._id }, { role: 'admin' });
   }
 }

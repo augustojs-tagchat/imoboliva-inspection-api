@@ -42,4 +42,11 @@ export class UserController {
   public async delete(@Param() params: { user_id: string }) {
     return await this.userService.deleteUser(params.user_id);
   }
+
+  @UseGuards(RoleGuard('admin'))
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch(':user_id/admin')
+  public async createAdmin(@Param() params: { user_id: string }) {
+    return await this.userService.userToAdmin(params.user_id);
+  }
 }
