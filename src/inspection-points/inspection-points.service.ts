@@ -140,9 +140,7 @@ export class InspectionPointsService {
     }
 
     const filteredInspectionPoints = selectedArea.inspection_points.filter(
-      (inspectionPoint) =>
-        String(inspectionPoint._id) !==
-        uploadInspectionPointImagesDto.inspection_id,
+      (inspectionPoint) => String(inspectionPoint._id) !== inspectionPointId,
     );
 
     if (!selectedInspectionPoint.images) {
