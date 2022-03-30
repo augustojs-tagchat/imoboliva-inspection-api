@@ -96,6 +96,7 @@ export class InspectionController {
     return await this.inspectionService.findByUserId(params.user_id);
   }
 
+  @UseGuards(RoleGuard('admin'))
   @UseGuards(JwtAuthenticationGuard)
   @Get()
   public async findAll() {
