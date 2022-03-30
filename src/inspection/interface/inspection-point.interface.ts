@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { IsNotEmpty, MinLength } from 'class-validator';
+import { File, FileDocument } from 'src/files/schemas/file.schema';
 
 export class IInspectionPoint {
   @IsNotEmpty()
@@ -9,6 +10,8 @@ export class IInspectionPoint {
   description: string;
 
   active: boolean;
+
+  images?: FileDocument[];
 
   @IsNotEmpty()
   entry: {

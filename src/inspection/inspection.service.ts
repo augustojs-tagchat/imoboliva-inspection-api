@@ -377,12 +377,12 @@ export class InspectionService {
 
     newArea.inspection_points = area.inspection_points;
 
-    if (!(String(inspection.user_id) === String(userId))) {
-      throw new HttpException(
-        'User does not have permission to edit this inspection',
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    // if (!(String(inspection.user_id) === String(userId))) {
+    //   throw new HttpException(
+    //     'User does not have permission to edit this inspection',
+    //     HttpStatus.FORBIDDEN,
+    //   );
+    // }
 
     inspection.real_state_areas.push(newArea);
 

@@ -1,4 +1,5 @@
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { File } from 'src/files/schemas/file.schema';
 
 class Entry {
   selected_points: string[];
@@ -26,4 +27,6 @@ export class IInspectionPoints {
   entry: Entry;
 
   exit: Exit;
+
+  images: File[];
 }
