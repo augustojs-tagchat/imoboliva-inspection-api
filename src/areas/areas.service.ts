@@ -6,6 +6,7 @@ import { Area, AreaDocument } from './schemas/area.schema';
 import { FilesService } from 'src/files/files.service';
 import { ObjectId } from 'mongodb';
 import { UpdateAreaDTO } from './dto/update-area.dto';
+import { PaginationDTO } from 'src/property/dto/pagination.dto';
 
 @Injectable()
 export class AreasService {
@@ -29,9 +30,50 @@ export class AreasService {
     return area.save();
   }
 
-  public async getAll() {
-    const areas = await this.areaModel.find();
-    return areas;
+  public async getAll(pagination: PaginationDTO) {
+    const page = parseInt(pagination.page, 10) || 1;
+    const limit = parseInt(pagination.limit, 10) || 25;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const total = await this.areaModel.countDocuments();
+
+    let query = this.areaModel.find();
+
+    query = query.skip(startIndex).limit(limit);
+
+    const data = await query;
+
+    // Pagination result
+    const paginatedData = {
+      next: {
+        page: 1,
+        limit: 1,
+      },
+      prev: {
+        page: 1,
+        limit: 1,
+      },
+    };
+
+    if (endIndex < total) {
+      paginatedData.next = {
+        page: page + 1,
+        limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      paginatedData.prev = {
+        page: page - 1,
+        limit,
+      };
+    }
+
+    return {
+      data,
+      count: data.length,
+      paginatedData,
+    };
   }
 
   public async findAreaById(areaId: string) {

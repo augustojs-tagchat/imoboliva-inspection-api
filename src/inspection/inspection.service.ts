@@ -13,6 +13,7 @@ import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import { FileDocument } from 'src/files/schemas/file.schema';
 import { UpdateExitInspectionDTO } from './dto/update-exit-inspection.dto';
 import { validObjectId } from 'src/utils/validObjectId';
+import { PaginationDTO } from 'src/property/dto/pagination.dto';
 @Injectable()
 export class InspectionService {
   constructor(
@@ -327,8 +328,50 @@ export class InspectionService {
     return inspections;
   }
 
-  public async findAll() {
-    return await this.inspectionModel.find();
+  public async findAll(pagination: PaginationDTO) {
+    const page = parseInt(pagination.page, 10) || 1;
+    const limit = parseInt(pagination.limit, 10) || 25;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const total = await this.inspectionModel.countDocuments();
+
+    let query = this.inspectionModel.find();
+
+    query = query.skip(startIndex).limit(limit);
+
+    const data = await query;
+
+    // Pagination result
+    const paginatedData = {
+      next: {
+        page: 1,
+        limit: 1,
+      },
+      prev: {
+        page: 1,
+        limit: 1,
+      },
+    };
+
+    if (endIndex < total) {
+      paginatedData.next = {
+        page: page + 1,
+        limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      paginatedData.prev = {
+        page: page - 1,
+        limit,
+      };
+    }
+
+    return {
+      data,
+      count: data.length,
+      paginatedData,
+    };
   }
 
   public async updateInspectionAreas(
