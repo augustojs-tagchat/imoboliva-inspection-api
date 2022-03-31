@@ -11,9 +11,8 @@ import { AddNewAreaDTO } from './dto/add-areas.dto';
 import { AreasService } from 'src/areas/areas.service';
 import { UpdateEntryInspectionDTO } from './dto/update-entry-inspection.dto';
 import { FileDocument } from 'src/files/schemas/file.schema';
-import mongoose from 'mongoose';
 import { UpdateExitInspectionDTO } from './dto/update-exit-inspection.dto';
-
+import { validObjectId } from 'src/utils/validObjectId';
 @Injectable()
 export class InspectionService {
   constructor(
@@ -317,16 +316,12 @@ export class InspectionService {
   }
 
   public async findByUserId(userId: string) {
-    const idIsValid = ObjectId.isValid(userId);
+    validObjectId(userId);
 
-    if (!idIsValid) {
-      throw new HttpException('Invalid ObjectId', HttpStatus.BAD_REQUEST);
-    }
-
-    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const user = await this.userService.findById(userId);
 
     const inspections = await this.inspectionModel.find({
-      user_id: userObjectId,
+      user_id: user._id,
     });
 
     return inspections;
