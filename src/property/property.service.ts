@@ -52,7 +52,7 @@ export class PropertyService {
     }
 
     return {
-      data: properties,
+      properties,
       count: properties.length,
       paginatedData,
     };
