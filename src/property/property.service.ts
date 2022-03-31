@@ -22,7 +22,7 @@ export class PropertyService {
 
     query = query.skip(startIndex).limit(limit);
 
-    const properties = await query;
+    const data = await query;
 
     // Pagination result
     const paginatedData = {
@@ -51,8 +51,8 @@ export class PropertyService {
     }
 
     return {
-      properties,
-      count: properties.length,
+      data,
+      count: data.length,
       paginatedData,
     };
   }

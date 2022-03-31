@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   UploadedFile,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { InspectionService } from './inspection.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
@@ -21,6 +22,7 @@ import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AddNewAreaDTO } from './dto/add-areas.dto';
 import RoleGuard from 'src/authentication/guard/role.guard';
+import { PaginationDTO } from 'src/property/dto/pagination.dto';
 
 @Controller('inspection')
 export class InspectionController {
@@ -99,8 +101,8 @@ export class InspectionController {
   @UseGuards(RoleGuard('admin'))
   @UseGuards(JwtAuthenticationGuard)
   @Get()
-  public async findAll() {
-    return await this.inspectionService.findAll();
+  public async findAll(@Query() pagination: PaginationDTO) {
+    return await this.inspectionService.findAll(pagination);
   }
 
   @UseGuards(JwtAuthenticationGuard)

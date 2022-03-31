@@ -7,8 +7,10 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/authentication/guard/jwt-authentication.guard';
+import { PaginationDTO } from 'src/property/dto/pagination.dto';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDTO } from './dto/update-area.dto';
@@ -25,8 +27,8 @@ export class AreasController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
-  async findAll() {
-    return await this.areasService.getAll();
+  async findAll(@Query() pagination: PaginationDTO) {
+    return await this.areasService.getAll(pagination);
   }
 
   @UseGuards(JwtAuthenticationGuard)
