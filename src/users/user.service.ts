@@ -29,7 +29,11 @@ export class UserService {
       return user;
     });
 
-    return usersArray;
+    const stringfiedUsers = JSON.stringify(usersArray);
+
+    const parsedUsers = JSON.parse(stringfiedUsers);
+
+    return parsedUsers;
   }
 
   public async findByEmail(email: string) {
